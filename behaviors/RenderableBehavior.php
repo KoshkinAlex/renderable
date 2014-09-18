@@ -18,6 +18,7 @@ class RenderableBehavior extends CActiveRecordBehavior
 	const TYPE_NTEXT = 'ntext';
 	const TYPE_HTML = 'html';
 	const TYPE_NUMBER = 'number';
+	const TYPE_FLOAT = 'float';
 	const TYPE_GENDER = 'gender';
 	const TYPE_DATE = 'date';
 	const TYPE_TIME = 'time';
@@ -34,6 +35,9 @@ class RenderableBehavior extends CActiveRecordBehavior
 	const TYPE_HIDDEN = 'hidden';
 	const TYPE_CALLBACK = 'callback';
 	const TYPE_LISTBOX = 'listbox';
+
+	// Default type used for render if original type view not found
+	const DEFAULT_TYPE = 'default';
 
 	// Render modes
 	const MODE_VIEW = 0;
@@ -64,8 +68,9 @@ class RenderableBehavior extends CActiveRecordBehavior
 	 */
 	public function renderField($attribute, $forceMode = false, $htmlOptions = [])
 	{
-
-		if (!$this->owner->hasAttribute($attribute) && !property_exists($this->owner, $attribute)) {
+		try {
+			$value = $this->owner->$attribute;
+		} catch (Exception $e) {
 			return $this->labelNoAttribute;
 		}
 
@@ -84,7 +89,7 @@ class RenderableBehavior extends CActiveRecordBehavior
 			$viewPath = $path . DIRECTORY_SEPARATOR . $viewFile;
 		}
 
-		// Firstly search in current controller views directory
+		// Then search in application views
 		if (!$viewPath) {
 			$path = YiiBase::getPathOfAlias("application.views.renderable");
 			if (is_file($path . DIRECTORY_SEPARATOR . $viewFile)) {
@@ -92,8 +97,17 @@ class RenderableBehavior extends CActiveRecordBehavior
 			}
 		}
 
-		// Lastly search in extension views directory
+		// Lastly search in extension views directory for default view
 		if (!$viewPath) {
+			$path = YiiBase::getPathOfAlias("application.extensions.renderable.views");
+			if (is_file($path . DIRECTORY_SEPARATOR . $viewFile)) {
+				$viewPath = $path . DIRECTORY_SEPARATOR . $viewFile;
+			}
+		}
+
+		// Okay ;( Lets use default view for all types of fields
+		if (!$viewPath) {
+			$viewFile = self::viewName(self::DEFAULT_TYPE, $mode) . '.php';;
 			$path = YiiBase::getPathOfAlias("application.extensions.renderable.views");
 			if (is_file($path . DIRECTORY_SEPARATOR . $viewFile)) {
 				$viewPath = $path . DIRECTORY_SEPARATOR . $viewFile;
@@ -156,12 +170,12 @@ class RenderableBehavior extends CActiveRecordBehavior
 
 		if (in_array(
 			$this->owner->getScenario(),
-			array(
+			[
 				ActiveRecord::SCENARIO_CREATE,
 				ActiveRecord::SCENARIO_UPDATE,
 				ActiveRecord::SCENARIO_SEARCH,
 				ActiveRecord::SCENARIO_SEARCH_ADMIN
-			)
+			]
 		)
 		) {
 			return self::MODE_EDIT;
@@ -197,7 +211,7 @@ class RenderableBehavior extends CActiveRecordBehavior
 					$attributeParams['type'] = $type;
 
 				} elseif (is_array($type)) {
-					$attributeParams = array();
+					$attributeParams = [];
 
 					foreach ($type as $k => $v) {
 
@@ -217,6 +231,10 @@ class RenderableBehavior extends CActiveRecordBehavior
 					}
 				}
 			}
+		}
+
+		if (!empty($attributeParams['data']) && is_callable($attributeParams['data'])) {
+			$attributeParams['data'] = $attributeParams['data']();
 		}
 
 		if (empty($attributeParams['htmlOptions'])) {
@@ -258,7 +276,7 @@ class RenderableBehavior extends CActiveRecordBehavior
 
 		if (in_array(
 				$fieldType,
-				array(
+				[
 					'raw',
 					'text',
 					'ntext',
@@ -270,7 +288,7 @@ class RenderableBehavior extends CActiveRecordBehavior
 					'image',
 					'url',
 					'size',
-				)
+				]
 			)
 			&& is_scalar($fieldValue)
 		) {

@@ -3,15 +3,17 @@ renderable
 
 Yii 1.* extension that allows render forms/views based on CModel attributes
 
-Requirements
--------------------------
+## Requirements
+
 1. Yii framework (minimum tested version 1.13)
 2. PHP 5.4
 
-Installation
--------------------------
+## Installation
+
 1. Copy all files to application/extensions/renderable directory
 2. Add this path to import section of application config file
+
+```php
 		return [
 			...
 			'import'=> [
@@ -20,20 +22,24 @@ Installation
 				...
 			],
 		];
+```
 
-Usage
--------------------------
+## Usage
+
 1. Attach RenderableBehavior to model
 
+```php
 		public function behaviors()
 		{
 			return [
 				'renderable' => ['class' => 'RenderableBehavior',],
 			];
-		}	
+		}
+```
 
 2. Define attribute types declaring attributeTypes() method
 
+```php
 		public function attributeTypes()
 		{
 			return [
@@ -48,8 +54,10 @@ Usage
 				'upload' => RenderableBehavior::TYPE_UPLOAD,
 			];
 		}
+```
 
 3. Use in in view file
+```php
 		/** @var CActiveRecord $model */
 
 		$model->setRenderMode(RenderableBehavior::MODE_EDIT); // Or RenderableBehavior::MODE_VIEW
@@ -59,4 +67,4 @@ Usage
 
 		// Force mode
 		$model->renderField($fieldName, RenderableBehavior::MODE_VIEW, $inputOptions);
-
+```
