@@ -12,4 +12,8 @@
  * @var array $htmlOptions
  */
 
-echo CHtml::activeTextField($model, $attribute, $htmlOptions);
+if (!$model->checkScalar($value)) {
+	$value = print_r($value, 1);
+}
+
+echo CHtml::encode($model->$attribute);

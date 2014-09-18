@@ -12,4 +12,6 @@
  * @var array $htmlOptions
  */
 
-echo CHtml::activeTextField($model, $attribute, $htmlOptions);
+$data = $fieldParams['data'];
+
+echo isset($fieldParams['data'][$value]) ? CHtml::encode($fieldParams['data'][$value]) : $model->renderable->labelNoValue;

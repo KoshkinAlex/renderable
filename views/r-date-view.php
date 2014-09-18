@@ -12,4 +12,4 @@
  * @var array $htmlOptions
  */
 
-echo CHtml::activeTextField($model, $attribute, $htmlOptions);
+echo \Yii::app()->dateFormatter->format('d MMMM yyyy', $value);
