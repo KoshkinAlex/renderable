@@ -5,7 +5,7 @@
  * @author: Koshkin Alexey <koshkin.alexey@gmail.com>
  *
  * @var CController $this
- * @var CActiveRecord $model
+ * @var CActiveRecord|RenderableBehavior $model
  * @var mixed $value
  * @var string $attribute
  * @var array $fieldParams
@@ -18,4 +18,4 @@ if (!isset($fieldParams['data'][$model->$attribute])) {
 	$fieldParams['data'] = array($model->$attribute => $model->renderable->labelNoValue) + $fieldParams['data'];
 }
 
-echo CHtml::activeDropDownList($model, $attribute,  $fieldParams['data'], $htmlOptions);
+echo BsHtml::activeDropDownList($model, $attribute,  $fieldParams['data'], $htmlOptions);

@@ -30,6 +30,7 @@ class RenderableBehavior extends CActiveRecordBehavior
 	const TYPE_SIZE = 'size';
 	const TYPE_UPLOAD = 'upload';
 	const TYPE_PASSWORD = 'password';
+	const TYPE_MONEY = 'money';
 
 	// Custom types
 	const TYPE_HIDDEN = 'hidden';
@@ -40,11 +41,8 @@ class RenderableBehavior extends CActiveRecordBehavior
 	const DEFAULT_TYPE = 'default';
 
 	// Render modes
-	const MODE_VIEW = 0;
-	const MODE_EDIT = 1;
-
-	/** @var null Current render mode */
-	public $renderMode = null;
+	const MODE_VIEW = 'view';
+	const MODE_EDIT = 'edit';
 
 	/** @var string Default attribute type (used if type is not defined) */
 	public $defaultType = self::TYPE_STRING;
@@ -53,34 +51,24 @@ class RenderableBehavior extends CActiveRecordBehavior
 	public $labelNoValue = '—';
 
 	/** @var string Label that appears when trying to render unknown attribute */
-	public $labelNoAttribute = '[unknown attribute]';
+	public $labelNoAttribute = '[unknown attribute "{attribute}"]';
 
 	/** @var string Label that replaces value that can't be rendered with current attribute type */
 	public $labelBadValue = '[value not renderable]';
 
-	/**
-	 * Get rendered HTML with field value
-	 *
-	 * @param $attribute mixed
-	 * @param $forceMode
-	 * @param array $htmlOptions
-	 * @return string
-	 */
-	public function renderField($attribute, $forceMode = false, $htmlOptions = [])
-	{
-		try {
-			$value = $this->owner->$attribute;
-		} catch (Exception $e) {
-			return $this->labelNoAttribute;
-		}
+	/** @var string Deafult format for field of type "date" */
+	public $formatDate = 'd MMMM yyyy';
 
-		$fieldParams = $this->normalizeAttributeParams($attribute, $this->owner->getScenario());
-		$fieldParams['htmlOptions'] = CMap::mergeArray($fieldParams['htmlOptions'], $htmlOptions);
+	/** @var string Deafult format for field of type "datetime" */
+	public $formatDateTime = 'd MMMM yyyy HH:mm';
 
-		$mode = ($forceMode !== false) ? $forceMode : $this->renderMode;
+	/** @var null Current render mode */
+	private $_renderMode = null;
 
-		$viewName = self::viewName($fieldParams['type'], $mode);
-		$viewFile = $viewName . '.php';
+
+	public function renderField($renderMode, $fieldType, $attributeName, $fieldParams, $htmlOptions = false, $value = false) {
+
+		$viewFile = $this->_viewName($fieldType, $renderMode);
 		$viewPath = false;
 
 		// Firstly search in current controller views directory
@@ -88,6 +76,8 @@ class RenderableBehavior extends CActiveRecordBehavior
 		if (is_file($path . DIRECTORY_SEPARATOR . $viewFile)) {
 			$viewPath = $path . DIRECTORY_SEPARATOR . $viewFile;
 		}
+
+		//TODO: search in theme dir
 
 		// Then search in application views
 		if (!$viewPath) {
@@ -107,7 +97,7 @@ class RenderableBehavior extends CActiveRecordBehavior
 
 		// Okay ;( Lets use default view for all types of fields
 		if (!$viewPath) {
-			$viewFile = self::viewName(self::DEFAULT_TYPE, $mode) . '.php';;
+			$viewFile = $this->_viewName(self::DEFAULT_TYPE, $renderMode);
 			$path = YiiBase::getPathOfAlias("application.extensions.renderable.views");
 			if (is_file($path . DIRECTORY_SEPARATOR . $viewFile)) {
 				$viewPath = $path . DIRECTORY_SEPARATOR . $viewFile;
@@ -119,42 +109,48 @@ class RenderableBehavior extends CActiveRecordBehavior
 				$viewPath,
 				[
 					'model' => $this->owner,
-					'value' => $this->owner->$attribute,
-					'attribute' => $attribute,
+					'attribute' => $attributeName,
 					'fieldParams' => $fieldParams,
-					'htmlOptions' => $fieldParams['htmlOptions']
+					'htmlOptions' => $htmlOptions !== false
+						? $htmlOptions
+						: (isset($fieldParams['htmlOptions'])
+							? $fieldParams['htmlOptions']
+							: []),
+					'value' => $value
+						? $value
+						: $this->owner->$attributeName,
 				],
 				true
 			);
+		} else {
+			return "Can't find view for field \"$fieldType\"";
 		}
-
-		return "[{$viewName}] not found";
 	}
 
 	/**
-	 * Generates view filename that contains render method for custom type
+	 * Get rendered HTML with field value
 	 *
-	 * @param $fieldType
-	 * @param $renderMode
+	 * @param $attribute mixed
+	 * @param $forceMode
+	 * @param array $htmlOptions
 	 * @return string
 	 */
-	public static function viewName($fieldType, $renderMode)
+	public function renderAttribute($attribute, $htmlOptions = [], $forceMode = false)
 	{
-		$viewNamePart = ['r'];
-		$viewNamePart[] = strtolower($fieldType);
-
-		switch ($renderMode) {
-
-			case self::MODE_VIEW:
-				$viewNamePart[] = 'view';
-				break;
-
-			case self::MODE_EDIT:
-				$viewNamePart[] = 'edit';
-				break;
+		try {
+			$value = $this->owner->$attribute;
+		} catch (Exception $e) {
+			return strtr($this->labelNoAttribute, ['{attribute}'=>$attribute]);
 		}
 
-		return implode('-', $viewNamePart);
+		$fieldParams = $this->_readParamsFromModel($attribute);
+		$fieldParams = $this->_normalizeAttributeParams($fieldParams);
+		$fieldParams['htmlOptions'] = CMap::mergeArray($fieldParams['htmlOptions'], $htmlOptions);
+		$renderMode = ($forceMode !== false)
+			? $forceMode
+			: $this->getRenderMode();
+
+		return $this->renderField($renderMode, $fieldParams['type'], $attribute, $fieldParams);
 	}
 
 	/**
@@ -162,10 +158,10 @@ class RenderableBehavior extends CActiveRecordBehavior
 	 *
 	 * @return int|null
 	 */
-	public function getMode()
+	public function getRenderMode()
 	{
-		if ($this->renderMode !== null) {
-			return $this->renderMode;
+		if ($this->_renderMode !== null) {
+			return $this->_renderMode;
 		}
 
 		if (in_array(
@@ -190,47 +186,160 @@ class RenderableBehavior extends CActiveRecordBehavior
 	 */
 	public function setRenderMode($mode)
 	{
-		$this->renderMode = $mode;
+		$this->_renderMode = $mode;
+	}
+
+	/**
+	 * Format attribute before according to it's type (before view mode render)
+	 * @param $fieldValue
+	 * @param array $fieldParams
+	 * @return string
+	 */
+	public function fieldView($fieldValue, $fieldParams)
+	{
+
+		$fieldType = $fieldParams['type'];
+
+		if (($methodView = $this->_methodNameByType('view', $fieldType)) !== false) {
+			return $this->$methodView($fieldValue, $fieldParams);
+		}
+
+		if ($fieldValue === null) {
+			return $this->labelNoValue;
+		}
+
+		if (in_array(
+				$fieldType,
+				[
+					self::TYPE_RAW,
+					self::TYPE_TEXT,
+					self::TYPE_NTEXT,
+					self::TYPE_HTML,
+					self::TYPE_TIME,
+					self::TYPE_BOOLEAN,
+					self::TYPE_NUMBER,
+					self::TYPE_EMAIL,
+					self::TYPE_IMAGE,
+					self::TYPE_URL,
+					self::TYPE_SIZE,
+				]
+			)
+			&& is_scalar($fieldValue)
+		) {
+			return $this->checkScalar($fieldValue)
+				? Yii::app()->format->format($fieldValue, $fieldType)
+				: $this->labelBadValue;
+		}
+
+		if ($fieldType == self::TYPE_DATE) {
+			return $this->checkScalar($fieldValue)
+				? Yii::app()->dateFormatter->format($this->formatDate, $fieldValue)
+				: $this->labelBadValue;
+		}
+
+		if ($fieldType == self::TYPE_DATETIME) {
+			return $this->checkScalar($fieldValue)
+				? Yii::app()->dateFormatter->format($this->formatDateTime, $fieldValue)
+				: $this->labelBadValue;
+		}
+
+		if ($fieldType == self::TYPE_LISTBOX) {
+			return !empty($fieldParams['data'][$fieldValue])
+				? $fieldParams['data'][$fieldValue]
+				: $this->labelNoValue;
+		}
+
+		return $this->checkScalar($fieldValue)
+			? $this->viewDefault($fieldValue, $fieldParams)
+			: $this->labelBadValue;
+	}
+
+	/**
+	 * Format attribute before according to it's type (before edit mode render)
+	 *
+	 * @param $attribute Attribute name
+	 * @param array $fieldParams Attribute parameters
+	 * @return string
+	 */
+	public function fieldEdit($attribute, $fieldParams)
+	{
+		$fieldType = $fieldParams['type'];
+
+		if (($methodEdit = $this->_methodNameByType('edit', $fieldType)) !== false) {
+			return $this->$methodEdit($attribute, $fieldParams);
+		}
+
+		return $this->checkScalar($this->owner->$attribute)
+			? $this->editDefault($attribute, $fieldParams)
+			: $this->labelBadValue;
+	}
+
+	/**
+	 * Check that attribute is scalar (can be rendered by it's value)
+	 *
+	 * @param string $value
+	 * @return bool
+	 */
+	public function checkScalar($value)
+	{
+		return (is_scalar($value) || is_null($value));
+	}
+
+	/**
+	 * Get attribute parameters defined in attributeTypes() method
+	 * @param $attribute
+	 * @return array
+	 */
+	private function _readParamsFromModel($attribute) {
+		if (method_exists($this->owner, 'attributeTypes')) {
+			$listTypes = $this->owner->attributeTypes();
+			if (!empty($listTypes[$attribute])) {
+				return $listTypes[$attribute];
+			}
+		}
+
+		return [];
 	}
 
 	/**
 	 * Check that all necessary fields exist
+	 * For each attribute can be called method "normalizeType", where "Type" is attribute type
 	 *
-	 * @param string $attribute Name of model attribute
-	 * @return array
+	 * @param array|string $params Input params
+	 * @return array Output params
 	 */
-	public function normalizeAttributeParams($attribute)
+	private function _normalizeAttributeParams($params)
 	{
-		$attributeParams = ['type' => $this->defaultType];
-		if (method_exists($this->owner, 'attributeTypes')) {
-			$listTypes = $this->owner->attributeTypes();
-			if (!empty($listTypes[$attribute])) {
-				$type = $listTypes[$attribute];
+		$attributeParams = [];
 
-				if (is_string($type)) {
-					$attributeParams['type'] = $type;
+		if (is_string($params)) {
+			$attributeParams['type'] = $params;
 
-				} elseif (is_array($type)) {
-					$attributeParams = [];
+		} elseif (is_array($params)) {
+			$attributeParams = [];
 
-					foreach ($type as $k => $v) {
+			foreach ($params as $k => $v) {
 
-						if (is_string($k)) {
-							$attributeParams[$k] = $v;
-						} else {
-							if ($k == 0) {
-								$attributeParams['type'] = $v;
-							}
+				if (is_string($k)) {
+					$attributeParams[$k] = $v;
+				} else {
+					if ($k == 0) {
+						$attributeParams['type'] = $v;
+					}
 
-							if ($k == 1) {
-								if ($attributeParams['type'] == self::TYPE_LISTBOX) {
-									$attributeParams['data'] = $v;
-								}
-							}
-						}
+					if ($k == 1) {
+						$attributeParams['data'] = $v;
 					}
 				}
 			}
+		}
+
+		if (empty($attributeParams['type'])) {
+			$attributeParams['type'] = $this->defaultType;
+		}
+
+		if (($methodNormalize = $this->_methodNameByType('normalize', $attributeParams['type'])) !== false) {
+			$this->$methodNormalize($attributeParams);
 		}
 
 		if (!empty($attributeParams['data']) && is_callable($attributeParams['data'])) {
@@ -255,132 +364,49 @@ class RenderableBehavior extends CActiveRecordBehavior
 	}
 
 	/**
-	 * Format attribute before according to it's type (before view mode render)
-	 * @param $fieldValue
-	 * @param array $fieldParams
-	 * @return string
-	 */
-	public function fieldView($fieldValue, $fieldParams)
-	{
-
-		$fieldType = $fieldParams['type'];
-
-		$method = 'view' . $fieldType;
-		if (method_exists($this, $method)) {
-			return $this->$method($fieldValue, $fieldParams);
-		}
-
-		if ($fieldValue === null) {
-			return $this->labelNoValue;
-		}
-
-		if (in_array(
-				$fieldType,
-				[
-					'raw',
-					'text',
-					'ntext',
-					'html',
-					'time',
-					'boolean',
-					'number',
-					'email',
-					'image',
-					'url',
-					'size',
-				]
-			)
-			&& is_scalar($fieldValue)
-		) {
-			return $this->checkScalar($fieldValue) ? Yii::app()->format->format(
-				$fieldValue,
-				$fieldType
-			) : $this->labelBadValue;
-		}
-
-		if ($fieldType == 'date') {
-			return $this->checkScalar($fieldValue) ? Yii::app()->dateFormatter->format(
-				'd MMMM yyyy',
-				$fieldValue
-			) : $this->labelBadValue;
-		}
-
-		if ($fieldType == 'datetime') {
-			return $this->checkScalar($fieldValue) ? Yii::app()->dateFormatter->format(
-				'd MMMM yyyy HH:mm',
-				$fieldValue
-			) : $this->labelBadValue;
-		}
-
-		if ($fieldType == self::TYPE_LISTBOX) {
-			return !empty($fieldParams['data'][$fieldValue]) ? $fieldParams['data'][$fieldValue] : $this->labelNoValue;
-		}
-
-		return $this->checkScalar($fieldValue) ? $this->viewDefault($fieldValue, $fieldParams) : $this->labelBadValue;
-	}
-
-	/**
-	 * Format attribute before according to it's type (before edit mode render)
+	 * Check existence of type-dependent method in current object
+	 * This option can be used in RenderableBehavior childs to extend type-dependent functionality
 	 *
-	 * @param $attribute Attribute name
-	 * @param array $fieldParams Attribute parameters
-	 * @return string
+	 * @param $methodName method prefix (e.g. view, edit, normalize)
+	 * @param $fieldType field type (e.g. string, number)
+	 * @return bool|string method name if exists in current implementation (e.g. editNumber, normalizeListbox)
 	 */
-	public function fieldEdit($attribute, $fieldParams)
+	private function _methodNameByType($methodName, $fieldType)
 	{
-		$fieldType = $fieldParams['type'];
+		$fieldType = ucfirst(strtolower($fieldType));
+		$methodName = strtolower($methodName) . $fieldType;
 
-		$method = 'edit' . $fieldType;
-		if (method_exists($this, $method)) {
-			return $this->$method($attribute, $fieldParams);
-		}
-
-		return $this->checkScalar($this->owner->$attribute) ? $this->editDefault(
-			$attribute,
-			$fieldParams
-		) : $this->labelBadValue;
-	}
-
-	/**
-	 * Render default value (view mode)
-	 *
-	 * @param $fieldValue
-	 * @param array $fieldParams
-	 * @return string
-	 */
-	public function viewDefault($fieldValue, $fieldParams)
-	{
-		if (!is_scalar($fieldValue)) {
-			$fieldValue = YII_DEBUG ? print_r($fieldValue, 1) : $this->labelBadValue;
-		}
-
-		return CHtml::encode($fieldValue);
-	}
-
-	/**
-	 * Render default value (edit mode)
-	 *
-	 * @param $attribute Attribute name
-	 * @param array $fieldParams Attribute parameters
-	 * @return string
-	 */
-	public function editDefault($attribute, $fieldParams)
-	{
-		if (!is_scalar($this->owner->$attribute)) {
-			return $this->labelBadValue;
+		if (method_exists($this, $methodName)) {
+			return $methodName;
 		} else {
-			return CHtml::activeTextField($this->owner, $attribute, $fieldParams['htmlOptions']);
+			return false;
 		}
 	}
 
 	/**
-	 * Check that attribute is scalar (can be rendered by it's value)
+	 * Generates view filename that contains render method for custom type
 	 *
-	 * @param string $value
-	 * @return bool
+	 * @param $fieldType
+	 * @param $renderMode
+	 * @return string
 	 */
-	public function checkScalar($value)
+	private function _viewName($fieldType, $renderMode)
 	{
-		return (is_scalar($value) || is_null($value));
+		$viewNamePart = ['r'];
+		$viewNamePart[] = strtolower($fieldType);
+
+		switch ($renderMode) {
+
+			case self::MODE_VIEW:
+				$viewNamePart[] = 'view';
+				break;
+
+			case self::MODE_EDIT:
+				$viewNamePart[] = 'edit';
+				break;
+		}
+
+		return implode('-', $viewNamePart) . '.php';
 	}
+
 }

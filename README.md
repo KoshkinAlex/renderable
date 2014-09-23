@@ -59,12 +59,12 @@ Yii 1.* extension that allows render forms/views based on CModel attributes
 3. Use in in view file
 ```php
 		/** @var CActiveRecord $model */
-
 		$model->setRenderMode(RenderableBehavior::MODE_EDIT); // Or RenderableBehavior::MODE_VIEW
 
-		$model->renderField('name');
-		$model->renderField('description');
+        // Autodetect field type, render mode and rendering properties
+		$model->renderAttribute('name');
 
-		// Force mode
-		$model->renderField($fieldName, RenderableBehavior::MODE_VIEW, $inputOptions);
+		// Force mode, field type, rendering properties and field attributes
+		$model->renderField(RenderableBehavior::MODE_EDIT, RenderableBehavior::TYPE_STRING, 'name', $fieldParams);
+
 ```
