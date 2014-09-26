@@ -7,6 +7,8 @@
  * Class RenderableBehavior
  * This behavior can be attached to CModel instances and allows to render model attributes
  * To specify types of model attributes specify attributeTypes() method
+ *
+ * @property CActiveRecord $owner
  */
 class RenderableBehavior extends CActiveRecordBehavior
 {
@@ -58,17 +60,17 @@ class RenderableBehavior extends CActiveRecordBehavior
 	/** @var string Label that replaces value that can't be rendered with current attribute type */
 	public $labelBadValue = '[value not renderable]';
 
-	/** @var string Deafult format for field of type "date" */
+	/** @var string Default format for field of type "date" */
 	public $formatDate = 'd MMMM yyyy';
 
-	/** @var string Deafult format for field of type "datetime" */
+	/** @var string Default format for field of type "datetime" */
 	public $formatDateTime = 'd MMMM yyyy HH:mm';
 
 	/** @var null Current render mode */
 	private $_renderMode = null;
 
 
-	public function renderField($renderMode, $fieldType, $attributeName, $fieldParams, $htmlOptions = false, $value = false) {
+	public function renderField($renderMode, $fieldType, $attributeName, $fieldParams, $htmlOptions = [], $value = false) {
 
 		$viewFile = $this->_viewName($fieldType, $renderMode);
 		$viewPath = false;
@@ -365,8 +367,8 @@ class RenderableBehavior extends CActiveRecordBehavior
 	 * Check existence of type-dependent method in current object
 	 * This option can be used in RenderableBehavior childs to extend type-dependent functionality
 	 *
-	 * @param $methodName method prefix (e.g. view, edit, normalize)
-	 * @param $fieldType field type (e.g. string, number)
+	 * @param string $methodName method prefix (e.g. view, edit, normalize)
+	 * @param string $fieldType field type (e.g. string, number)
 	 * @return bool|string method name if exists in current implementation (e.g. editNumber, normalizeListbox)
 	 */
 	private function _methodNameByType($methodName, $fieldType)
@@ -384,8 +386,8 @@ class RenderableBehavior extends CActiveRecordBehavior
 	/**
 	 * Generates view filename that contains render method for custom type
 	 *
-	 * @param $fieldType
-	 * @param $renderMode
+	 * @param string $fieldType
+	 * @param string $renderMode
 	 * @return string
 	 */
 	private function _viewName($fieldType, $renderMode)

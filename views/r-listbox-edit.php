@@ -13,7 +13,7 @@
  */
 
 if (!isset($fieldParams['data'][$model->$attribute])) {
-	$fieldParams['data'] = array($model->$attribute => $model->renderable->labelNoValue) + $fieldParams['data'];
+	$fieldParams['data'] = array($model->$attribute => $model->labelNoValue) + $fieldParams['data'];
 }
 
 echo CHtml::activeDropDownList($model, $attribute,  $fieldParams['data'], $htmlOptions);

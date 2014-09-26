@@ -14,4 +14,4 @@
 
 $data = $fieldParams['data'];
 
-echo isset($fieldParams['data'][$value]) ? CHtml::encode($fieldParams['data'][$value]) : $model->renderable->labelNoValue;
+echo isset($fieldParams['data'][$value]) ? CHtml::encode($fieldParams['data'][$value]) : $model->labelNoValue;
