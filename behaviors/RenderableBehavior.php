@@ -31,11 +31,13 @@ class RenderableBehavior extends CActiveRecordBehavior
 	const TYPE_UPLOAD = 'upload';
 	const TYPE_PASSWORD = 'password';
 	const TYPE_MONEY = 'money';
+	const TYPE_DELETE = 'delete';
 
 	// Custom types
 	const TYPE_HIDDEN = 'hidden';
 	const TYPE_CALLBACK = 'callback';
 	const TYPE_LISTBOX = 'listbox';
+	const TYPE_RADIODUTTONLIST = 'radiobuttonlist';
 
 	// Default type used for render if original type view not found
 	const DEFAULT_TYPE = 'default';
@@ -150,6 +152,10 @@ class RenderableBehavior extends CActiveRecordBehavior
 			? $forceMode
 			: $this->getRenderMode();
 
+		if ($renderMode == self::MODE_EDIT && !$this->owner->isAttributeSafe($attribute)) {
+			$renderMode = self::MODE_VIEW;
+		}
+
 		return $this->renderField($renderMode, $fieldParams['type'], $attribute, $fieldParams);
 	}
 
@@ -164,15 +170,7 @@ class RenderableBehavior extends CActiveRecordBehavior
 			return $this->_renderMode;
 		}
 
-		if (in_array(
-			$this->owner->getScenario(),
-			[
-				ActiveRecord::SCENARIO_CREATE,
-				ActiveRecord::SCENARIO_UPDATE,
-				ActiveRecord::SCENARIO_SEARCH,
-				ActiveRecord::SCENARIO_SEARCH_ADMIN
-			]
-		)
+		if (in_array($this->owner->getScenario(), [ 'create', 'insert', 'update', 'search'])
 		) {
 			return self::MODE_EDIT;
 		}

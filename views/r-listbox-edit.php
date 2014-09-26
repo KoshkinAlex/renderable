@@ -12,10 +12,8 @@
  * @var array $htmlOptions
  */
 
-BsHtml::addCssClass('form-control', $fieldParams['htmlOptions']);
-
 if (!isset($fieldParams['data'][$model->$attribute])) {
 	$fieldParams['data'] = array($model->$attribute => $model->renderable->labelNoValue) + $fieldParams['data'];
 }
 
-echo BsHtml::activeDropDownList($model, $attribute,  $fieldParams['data'], $htmlOptions);
+echo CHtml::activeDropDownList($model, $attribute,  $fieldParams['data'], $htmlOptions);
