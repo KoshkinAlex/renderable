@@ -10,6 +10,15 @@
  * @var string $attribute
  * @var array $fieldParams
  * @var array $htmlOptions
+ *
+ * Model settings:
+ * @var string $fieldParams['path'] Directory that contains image
  */
 
-return CHtml::activeRadioButtonList($model, $attribute, $fieldParams['data'], $htmlOptions);
+if ($value) {
+	if (!empty($fieldParams['path'])) {
+		$value = $fieldParams['path'].$value;
+	}
+
+	echo CHtml::image($value);
+}

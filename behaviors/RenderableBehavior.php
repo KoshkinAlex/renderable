@@ -343,7 +343,7 @@ class RenderableBehavior extends CActiveRecordBehavior
 		}
 
 		if (!empty($attributeParams['data']) && is_callable($attributeParams['data'])) {
-			$attributeParams['data'] = $attributeParams['data']();
+			$attributeParams['data'] = $attributeParams['data']($this->owner);
 		}
 
 		if (empty($attributeParams['htmlOptions'])) {
