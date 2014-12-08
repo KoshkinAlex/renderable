@@ -149,7 +149,8 @@ class RenderableBehavior extends CActiveRecordBehavior
 
 		$fieldParams = $this->_readParamsFromModel($attribute);
 		$fieldParams = $this->_normalizeAttributeParams($fieldParams);
-		$fieldParams['htmlOptions'] = CMap::mergeArray($fieldParams['htmlOptions'], $htmlOptions);
+		$inputOptions = CMap::mergeArray($fieldParams['htmlOptions'], $htmlOptions);
+
 		$renderMode = ($forceMode !== false)
 			? $forceMode
 			: $this->getRenderMode();
@@ -158,7 +159,7 @@ class RenderableBehavior extends CActiveRecordBehavior
 			$renderMode = self::MODE_VIEW;
 		}
 
-		return $this->renderField($renderMode, $fieldParams['type'], $attribute, $fieldParams);
+		return $this->renderField($renderMode, $fieldParams['type'], $attribute, $fieldParams, $inputOptions);
 	}
 
 	/**
@@ -342,12 +343,28 @@ class RenderableBehavior extends CActiveRecordBehavior
 			$this->$methodNormalize($attributeParams);
 		}
 
-		if (!empty($attributeParams['data']) && is_callable($attributeParams['data'])) {
-			$attributeParams['data'] = $attributeParams['data']($this->owner);
+		// Callable attributes
+		foreach (['data', 'value'] as $attr) {
+			if (!empty($attributeParams[$attr]) && !is_array($attributeParams[$attr]) && is_callable($attributeParams[$attr])) {
+				$attributeParams[$attr] = $attributeParams[$attr]($this->owner);
+			}
 		}
 
-		if (empty($attributeParams['htmlOptions'])) {
-			$attributeParams['htmlOptions'] = [];
+		// Not empty attributes
+		foreach (['data', 'htmlOptions'] as $attr) {
+			if (empty($attributeParams[$attr])) {
+				$attributeParams[$attr] = [];
+			}
+		}
+
+		// Custom scenarios can override attribute settings
+		if (!empty($attributeParams['onScenario']) && !empty($attributeParams['onScenario'][$this->owner->getScenario()])) {
+			$overrideScenario = $attributeParams['onScenario'][$this->owner->getScenario()];
+			if (is_array($overrideScenario) && !empty($overrideScenario)) {
+				$attributeParams = CMap::mergeArray($attributeParams, $overrideScenario);
+			} elseif(is_callable($overrideScenario)) {
+				$attributeParams = $overrideScenario($attributeParams);
+			}
 		}
 
 		return $attributeParams;

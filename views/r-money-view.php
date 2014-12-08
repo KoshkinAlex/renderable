@@ -12,8 +12,10 @@
  * @var array $htmlOptions
  */
 
-if (!isset($fieldParams['data'][$model->$attribute])) {
-	$fieldParams['data'] = [$model->$attribute => $model->labelNoValue] + $fieldParams['data'];
+if (!empty($fieldParams['currencyField'])) {
+	$currency = $model->getAttribute($fieldParams['currencyField']);
+} else {
+	$currency = '';
 }
 
-echo CHtml::activeDropDownList($model, $attribute,  $fieldParams['data'], $htmlOptions);
+echo Yii::app()->formatter->formatMoney($value, $currency);

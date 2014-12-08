@@ -12,8 +12,6 @@
  * @var array $htmlOptions
  */
 
-if (!isset($fieldParams['data'][$model->$attribute])) {
-	$fieldParams['data'] = [$model->$attribute => $model->labelNoValue] + $fieldParams['data'];
-}
+$data = $fieldParams['data'];
 
-echo CHtml::activeDropDownList($model, $attribute,  $fieldParams['data'], $htmlOptions);
+echo isset($fieldParams['data'][$value]) ? CHtml::encode($fieldParams['data'][$value]) : $model->labelNoValue;

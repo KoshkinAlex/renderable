@@ -12,8 +12,7 @@
  * @var array $htmlOptions
  */
 
-if (!isset($fieldParams['data'][$model->$attribute])) {
-	$fieldParams['data'] = [$model->$attribute => $model->labelNoValue] + $fieldParams['data'];
-}
+if (!isset($htmlOptions['class'])) $htmlOptions['class'] = '';
+$htmlOptions['class'] .= ' js-money-input';
 
-echo CHtml::activeDropDownList($model, $attribute,  $fieldParams['data'], $htmlOptions);
+echo $model->renderField(RenderableBehavior::MODE_EDIT, RenderableBehavior::TYPE_NUMBER, $attribute, $fieldParams, $htmlOptions);
