@@ -32,14 +32,14 @@ class RenderableBehavior extends CActiveRecordBehavior
 	const TYPE_SIZE = 'size';
 	const TYPE_UPLOAD = 'upload';
 	const TYPE_PASSWORD = 'password';
-	const TYPE_MONEY = 'money';
-	const TYPE_DELETE = 'delete';
 
 	// Custom types
 	const TYPE_HIDDEN = 'hidden';
 	const TYPE_CALLBACK = 'callback';
 	const TYPE_LISTBOX = 'listbox';
 	const TYPE_RADIODUTTONLIST = 'radiobuttonlist';
+	const TYPE_MONEY = 'money';
+	const TYPE_DELETE = 'delete';
 
 	// Default type used for render if original type view not found
 	const DEFAULT_TYPE = 'default';
@@ -157,6 +157,10 @@ class RenderableBehavior extends CActiveRecordBehavior
 
 		if ($renderMode == self::MODE_EDIT && !$this->owner->isAttributeSafe($attribute)) {
 			$renderMode = self::MODE_VIEW;
+		}
+
+		if ($fieldParams['type'] == self::TYPE_CALLBACK) {
+			return $fieldParams['data'];
 		}
 
 		return $this->renderField($renderMode, $fieldParams['type'], $attribute, $fieldParams, $inputOptions);
@@ -343,6 +347,16 @@ class RenderableBehavior extends CActiveRecordBehavior
 			$this->$methodNormalize($attributeParams);
 		}
 
+		// Custom scenarios can override attribute settings
+		if (!empty($attributeParams['onScenario']) && !empty($attributeParams['onScenario'][$this->owner->getScenario()])) {
+			$overrideScenario = $attributeParams['onScenario'][$this->owner->getScenario()];
+			if (is_array($overrideScenario) && !empty($overrideScenario)) {
+				$attributeParams = CMap::mergeArray($attributeParams, $this->_normalizeAttributeParams($overrideScenario));
+			} elseif(is_callable($overrideScenario)) {
+				$attributeParams = $overrideScenario($attributeParams);
+			}
+		}
+
 		// Callable attributes
 		foreach (['data', 'value'] as $attr) {
 			if (!empty($attributeParams[$attr]) && !is_array($attributeParams[$attr]) && is_callable($attributeParams[$attr])) {
@@ -354,16 +368,6 @@ class RenderableBehavior extends CActiveRecordBehavior
 		foreach (['data', 'htmlOptions'] as $attr) {
 			if (empty($attributeParams[$attr])) {
 				$attributeParams[$attr] = [];
-			}
-		}
-
-		// Custom scenarios can override attribute settings
-		if (!empty($attributeParams['onScenario']) && !empty($attributeParams['onScenario'][$this->owner->getScenario()])) {
-			$overrideScenario = $attributeParams['onScenario'][$this->owner->getScenario()];
-			if (is_array($overrideScenario) && !empty($overrideScenario)) {
-				$attributeParams = CMap::mergeArray($attributeParams, $overrideScenario);
-			} elseif(is_callable($overrideScenario)) {
-				$attributeParams = $overrideScenario($attributeParams);
 			}
 		}
 
