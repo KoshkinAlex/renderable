@@ -8,9 +8,21 @@
  * This behavior can be attached to CModel instances and allows to render model attributes
  * To specify types of model attributes specify attributeTypes() method
  *
- * @property CActiveRecord $owner
+ * Attribute params:
+ *
+ * 	type (string): 				Generally defines attribute render mode. Required.
+ *	value (string|callback): 	Render value can be set (or taken from model)
+ *	data (array|callback): 		Some attribute types (e.g. listbox) need additional data to render
+ *	onScenario (array): 		Array consists of scenario names, as keys and values can be an arrays or callbacks and
+ * 								override other attributes in this scenario (e.g. different types in different scenarios)
+ * 	htmlOptions: (array):		Directly goes to input htmlOptions
+ *
+ * Parent model callbacks:
+ * 	afterNormalize($attributeParams, $this->owner)
+ *
+ * @property \CActiveRecord $owner
  */
-class RenderableBehavior extends CActiveRecordBehavior
+class RenderableBehavior extends \CActiveRecordBehavior
 {
 
 	// Types defined in CFormatter
@@ -85,7 +97,7 @@ class RenderableBehavior extends CActiveRecordBehavior
 
 		// Then search in application views
 		if (!$viewPath) {
-			$path = YiiBase::getPathOfAlias("application.views.renderable");
+			$path = \YiiBase::getPathOfAlias("application.views.renderable");
 			if (is_file($path . DIRECTORY_SEPARATOR . $viewFile)) {
 				$viewPath = $path . DIRECTORY_SEPARATOR . $viewFile;
 			}
@@ -93,7 +105,7 @@ class RenderableBehavior extends CActiveRecordBehavior
 
 		// Lastly search in extension views directory for default view
 		if (!$viewPath) {
-			$path = YiiBase::getPathOfAlias("application.extensions.renderable.views");
+			$path = \YiiBase::getPathOfAlias("application.extensions.renderable.views");
 			if (is_file($path . DIRECTORY_SEPARATOR . $viewFile)) {
 				$viewPath = $path . DIRECTORY_SEPARATOR . $viewFile;
 			}
@@ -102,7 +114,7 @@ class RenderableBehavior extends CActiveRecordBehavior
 		// Okay ;( Lets use default view for all types of fields
 		if (!$viewPath) {
 			$viewFile = $this->_viewName(self::DEFAULT_TYPE, $renderMode);
-			$path = YiiBase::getPathOfAlias("application.extensions.renderable.views");
+			$path = \YiiBase::getPathOfAlias("application.extensions.renderable.views");
 			if (is_file($path . DIRECTORY_SEPARATOR . $viewFile)) {
 				$viewPath = $path . DIRECTORY_SEPARATOR . $viewFile;
 			}
@@ -149,7 +161,7 @@ class RenderableBehavior extends CActiveRecordBehavior
 
 		$fieldParams = $this->_readParamsFromModel($attribute);
 		$fieldParams = $this->_normalizeAttributeParams($fieldParams);
-		$inputOptions = CMap::mergeArray($fieldParams['htmlOptions'], $htmlOptions);
+		$inputOptions = \CMap::mergeArray($fieldParams['htmlOptions'], $htmlOptions);
 
 		$renderMode = ($forceMode !== false)
 			? $forceMode
@@ -232,19 +244,19 @@ class RenderableBehavior extends CActiveRecordBehavior
 			&& is_scalar($fieldValue)
 		) {
 			return $this->checkScalar($fieldValue)
-				? Yii::app()->format->format($fieldValue, $fieldType)
+				? \Yii::app()->format->format($fieldValue, $fieldType)
 				: $this->labelBadValue;
 		}
 
 		if ($fieldType == self::TYPE_DATE) {
 			return $this->checkScalar($fieldValue)
-				? Yii::app()->dateFormatter->format($this->formatDate, $fieldValue)
+				? \Yii::app()->dateFormatter->format($this->formatDate, $fieldValue)
 				: $this->labelBadValue;
 		}
 
 		if ($fieldType == self::TYPE_DATETIME) {
 			return $this->checkScalar($fieldValue)
-				? Yii::app()->dateFormatter->format($this->formatDateTime, $fieldValue)
+				? \Yii::app()->dateFormatter->format($this->formatDateTime, $fieldValue)
 				: $this->labelBadValue;
 		}
 
@@ -343,15 +355,11 @@ class RenderableBehavior extends CActiveRecordBehavior
 			$attributeParams['type'] = $this->defaultType;
 		}
 
-		if (($methodNormalize = $this->_methodNameByType('normalize', $attributeParams['type'])) !== false) {
-			$this->$methodNormalize($attributeParams);
-		}
-
 		// Custom scenarios can override attribute settings
 		if (!empty($attributeParams['onScenario']) && !empty($attributeParams['onScenario'][$this->owner->getScenario()])) {
 			$overrideScenario = $attributeParams['onScenario'][$this->owner->getScenario()];
 			if (is_array($overrideScenario) && !empty($overrideScenario)) {
-				$attributeParams = CMap::mergeArray($attributeParams, $this->_normalizeAttributeParams($overrideScenario));
+				$attributeParams = \CMap::mergeArray($attributeParams, $this->_normalizeAttributeParams($overrideScenario));
 			} elseif(is_callable($overrideScenario)) {
 				$attributeParams = $overrideScenario($attributeParams);
 			}
@@ -371,17 +379,27 @@ class RenderableBehavior extends CActiveRecordBehavior
 			}
 		}
 
+		// Call normalizeXXX method from model
+		$methodName = 'normalize'.ucfirst(strtolower($attributeParams['type']));
+		if (method_exists($this->owner, $methodName)) {
+			$this->owner->$methodName($attributeParams);
+		}
+
+		if (!empty($attributeParams['afterNormalize']) && is_callable($attributeParams['afterNormalize'])) {
+			$attributeParams = $attributeParams['afterNormalize']($attributeParams, $this->owner);
+		}
+
 		return $attributeParams;
 	}
 
 	/**
 	 * Return instance of Controller. User to call render methods.
 	 *
-	 * @return CController
+	 * @return \CController
 	 */
 	private function _getController()
 	{
-		return Yii::app()->getController();
+		return \Yii::app()->getController();
 	}
 
 	/**
