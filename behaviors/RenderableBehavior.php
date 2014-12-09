@@ -78,6 +78,9 @@ class RenderableBehavior extends \CActiveRecordBehavior
 	/** @var string Default format for field of type "datetime" */
 	public $formatDateTime = 'd MMMM yyyy HH:mm';
 
+	/** @var array In this scenarios RenderMode is autodetected as self::MODE_EDIT */
+	public $editScenarios = [ ];
+
 	/** @var null Current render mode */
 	private $_renderMode = null;
 
@@ -189,8 +192,7 @@ class RenderableBehavior extends \CActiveRecordBehavior
 			return $this->_renderMode;
 		}
 
-		if (in_array($this->owner->getScenario(), [ 'create', 'insert', 'update', 'search'])
-		) {
+		if (is_array($this->editScenarios) && !empty($this->editScenarios) && in_array($this->owner->getScenario(), $this->editScenarios)) {
 			return self::MODE_EDIT;
 		}
 
