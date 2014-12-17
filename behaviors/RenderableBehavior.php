@@ -15,6 +15,8 @@
  *	data (array|callback): 		Some attribute types (e.g. listbox) need additional data to render
  *	onScenario (array): 		Array consists of scenario names, as keys and values can be an arrays or callbacks and
  * 								override other attributes in this scenario (e.g. different types in different scenarios)
+ * 	onMode (array):				Array consists of render modes, as keys and values can be an arrays or callbacks and
+ * 								override other attributes in this render mode similar to onScenario
  * 	htmlOptions: (array):		Directly goes to input htmlOptions
  *
  * Parent model callbacks:
@@ -164,6 +166,7 @@ class RenderableBehavior extends \CActiveRecordBehavior
 
 		$fieldParams = $this->_readParamsFromModel($attribute);
 		$fieldParams = $this->_normalizeAttributeParams($fieldParams);
+
 		$inputOptions = \CMap::mergeArray($fieldParams['htmlOptions'], $htmlOptions);
 
 		$renderMode = ($forceMode !== false)
@@ -173,6 +176,19 @@ class RenderableBehavior extends \CActiveRecordBehavior
 		if ($renderMode == self::MODE_EDIT && !$this->owner->isAttributeSafe($attribute)) {
 			$renderMode = self::MODE_VIEW;
 		}
+
+		// Custom render mode can override attribute settings
+		if (!empty($fieldParams['onMode']) && !empty($fieldParams['onMode'][$renderMode])) {
+			$overrideMode = $fieldParams['onMode'][$renderMode];
+			if (is_array($overrideMode) && !empty($overrideMode)) {
+				$fieldParams = \CMap::mergeArray($fieldParams, $this->_normalizeAttributeParams($overrideMode));
+			} elseif(is_callable($overrideMode)) {
+				$fieldParams = $overrideMode($fieldParams);
+			}
+		}
+
+		// Field value passing from params without transformation rendered
+		if (!empty($fieldParams['value']) && is_string($fieldParams['value'])) return $fieldParams['value'];
 
 		if ($fieldParams['type'] == self::TYPE_CALLBACK) {
 			return $fieldParams['data'];
