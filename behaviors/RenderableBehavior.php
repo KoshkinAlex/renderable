@@ -68,6 +68,9 @@ class RenderableBehavior extends \CActiveRecordBehavior
 	/** @var string Label that appears when attribute value is empty */
 	public $labelNoValue = '—';
 
+	/** @var string Label that appears when attribute is forbidden */
+	public $labelNoAccess = '[x]';
+
 	/** @var string Label that appears when trying to render unknown attribute */
 	public $labelNoAttribute = '[unknown attribute "{attribute}"]';
 
@@ -132,7 +135,7 @@ class RenderableBehavior extends \CActiveRecordBehavior
 					'model' => $this->owner,
 					'attribute' => $attributeName,
 					'fieldParams' => $fieldParams,
-					'htmlOptions' => $htmlOptions !== false
+					'htmlOptions' => !empty($htmlOptions)
 						? $htmlOptions
 						: (isset($fieldParams['htmlOptions'])
 							? $fieldParams['htmlOptions']
@@ -175,6 +178,13 @@ class RenderableBehavior extends \CActiveRecordBehavior
 
 		if ($renderMode == self::MODE_EDIT && !$this->owner->isAttributeSafe($attribute)) {
 			$renderMode = self::MODE_VIEW;
+		}
+
+		if (isset($fieldParams['access']) && isset($fieldParams['access'][$this->owner->getScenario()])) {
+			$accessValue = $fieldParams['access'][$this->owner->getScenario()];
+			if ((is_callable($accessValue) && $accessValue($this->owner) == false) || $accessValue == false) {
+				return $this->labelNoAccess;
+			}
 		}
 
 		// Custom render mode can override attribute settings
