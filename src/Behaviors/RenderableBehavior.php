@@ -3,6 +3,8 @@
  * @author: Koshkin Alexey <koshkin.alexey@gmail.com>
  */
 
+namespace Renderable\Behaviors;
+
 /**
  * Class RenderableBehavior
  * This behavior can be attached to CModel instances and allows to render model attributes
@@ -22,6 +24,7 @@
  * Parent model callbacks:
  * 	afterNormalize($attributeParams, $this->owner)
  *
+ * @package Renderable\Behaviors
  * @property \CActiveRecord $owner
  */
 class RenderableBehavior extends \CActiveRecordBehavior

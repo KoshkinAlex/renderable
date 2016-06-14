@@ -1,4 +1,2 @@
 .idea
-diff.sh
-*.sh
-
+/vendor/

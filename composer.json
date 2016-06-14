@@ -1,0 +1,20 @@
+{
+    "name": "koshkin/yii-renderable",
+    "description": "Yii 1.* extension that allows to define render rules for model attributes and reuse this rules in other models",
+    "homepage": "https://github.com/KoshkinAlex/renderable",
+    "type": "package",
+    "license": "MIT",
+    "require": {
+      "php": ">=5.3.0",
+      "yiisoft/yii": "1.1.15@stable"
+    },
+    "autoload": {
+      "psr-4": { "Renderable\\": "src/" }
+    },
+    "authors": [
+        {
+            "name": "Koshkin Alex",
+            "email": "Koshkin.Alexey@gmail.com"
+        }
+    ]
+}
