@@ -15,6 +15,8 @@
  * @var $fieldParams['displayAttribute'] Attribute that stores uploaded filename
  */
 
+use Renderable\Behaviors\RenderableBehavior;
+
 if (!empty($fieldParams['displayAttribute']) && $model->getAttribute($fieldParams['displayAttribute'])) {
 	echo $model->renderAttribute($fieldParams['displayAttribute']);
 }

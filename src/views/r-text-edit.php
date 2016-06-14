@@ -12,4 +12,6 @@
  * @var array $htmlOptions
  */
 
+use Renderable\Behaviors\RenderableBehavior;
+
 echo CHtml::activeTextArea($model, $attribute, $htmlOptions);

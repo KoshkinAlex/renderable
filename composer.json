@@ -5,8 +5,8 @@
     "type": "package",
     "license": "MIT",
     "require": {
-      "php": ">=5.3.0",
-      "yiisoft/yii": "1.1.15@stable"
+      "php": ">=5.5.0",
+      "yiisoft/yii": "@stable"
     },
     "autoload": {
       "psr-4": { "Renderable\\": "src/" }

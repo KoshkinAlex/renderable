@@ -12,5 +12,7 @@
  * @var array $htmlOptions
  */
 
+use Renderable\Behaviors\RenderableBehavior;
+
 $htmlOptions = CMap::mergeArray(['size'=>3], $htmlOptions);
 echo $model->renderField(RenderableBehavior::MODE_EDIT, RenderableBehavior::TYPE_STRING, $attribute, $fieldParams, $htmlOptions);

@@ -14,4 +14,15 @@
 
 use Renderable\Behaviors\RenderableBehavior;
 
-return CHtml::activeRadioButtonList($model, $attribute, $fieldParams[RenderableBehavior::P_DATA], $htmlOptions);
+$list = [];
+foreach ($fieldParams[RenderableBehavior::P_DATA] as $bit=>$name) {
+
+	if ($value & $bit) {
+		$list[] = '<b>+<b>&nbsp;'.$name;
+	} else {
+		if (!empty($fieldParams['showOnlyActive'])) continue;
+		$list[] = '<b>-</b>&nbsp;'.$name;
+	}
+}
+echo implode('<br/>', $list);
+

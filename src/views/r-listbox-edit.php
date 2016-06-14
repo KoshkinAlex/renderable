@@ -12,8 +12,10 @@
  * @var array $htmlOptions
  */
 
-if (!isset($fieldParams['data'][$model->$attribute])) {
-	$fieldParams['data'] = [$model->$attribute => $model->labelNoValue] + $fieldParams['data'];
+use Renderable\Behaviors\RenderableBehavior;
+
+if (!isset($htmlOptions['empty']) && !isset($fieldParams[RenderableBehavior::P_DATA][$model->{$attribute}])) {
+	$fieldParams[RenderableBehavior::P_DATA] = [$model->{$attribute} => $model->labelNoValue] + $fieldParams[RenderableBehavior::P_DATA];
 }
 
-echo CHtml::activeDropDownList($model, $attribute,  $fieldParams['data'], $htmlOptions);
+echo CHtml::activeDropDownList($model, $attribute,  $fieldParams[RenderableBehavior::P_DATA], $htmlOptions);

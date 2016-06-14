@@ -12,6 +12,8 @@
  * @var array $htmlOptions
  */
 
+use Renderable\Behaviors\RenderableBehavior;
+
 if (!isset($htmlOptions['class'])) $htmlOptions['class'] = '';
 $htmlOptions['class'] .= ' js-money-input';
 

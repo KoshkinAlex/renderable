@@ -22,13 +22,14 @@ namespace Renderable\Behaviors;
  * 	htmlOptions: (array):		Directly goes to input htmlOptions
  *
  * Parent model callbacks:
- * 	afterNormalize($attributeParams, $this->owner)
+ * 	afterNormalize($attributeParams, $this->getOwner())
  *
  * @package Renderable\Behaviors
  * @property \CActiveRecord $owner
  */
-class RenderableBehavior extends \CActiveRecordBehavior
+class RenderableBehavior extends AbstractRenderableBehavior
 {
+	const P_TYPE = 'type';
 
 	// Types defined in CFormatter
 	const TYPE_RAW = 'raw';
@@ -42,6 +43,7 @@ class RenderableBehavior extends \CActiveRecordBehavior
 	const TYPE_DATE = 'date';
 	const TYPE_TIME = 'time';
 	const TYPE_DATETIME = 'datetime';
+	const TYPE_DATEPICKER = 'datepicker';
 	const TYPE_BOOLEAN = 'boolean';
 	const TYPE_EMAIL = 'email';
 	const TYPE_IMAGE = 'image';
@@ -56,29 +58,15 @@ class RenderableBehavior extends \CActiveRecordBehavior
 	const TYPE_LISTBOX = 'listbox';
 	const TYPE_RADIODUTTONLIST = 'radiobuttonlist';
 	const TYPE_MONEY = 'money';
-	const TYPE_DELETE = 'delete';
+	const TYPE_CHECKLIST = 'checklist';
+	const TYPE_BITMASK = 'bitmask';
+	const TYPE_UPLOAD_FILES = 'upload-files';
 
 	// Default type used for render if original type view not found
 	const DEFAULT_TYPE = 'default';
 
-	// Render modes
-	const MODE_VIEW = 'view';
-	const MODE_EDIT = 'edit';
-
 	/** @var string Default attribute type (used if type is not defined) */
 	public $defaultType = self::TYPE_STRING;
-
-	/** @var string Label that appears when attribute value is empty */
-	public $labelNoValue = '—';
-
-	/** @var string Label that appears when attribute is forbidden */
-	public $labelNoAccess = '[x]';
-
-	/** @var string Label that appears when trying to render unknown attribute */
-	public $labelNoAttribute = '[unknown attribute "{attribute}"]';
-
-	/** @var string Label that replaces value that can't be rendered with current attribute type */
-	public $labelBadValue = '[value not renderable]';
 
 	/** @var string Default format for field of type "date" */
 	public $formatDate = 'd MMMM yyyy';
@@ -89,11 +77,41 @@ class RenderableBehavior extends \CActiveRecordBehavior
 	/** @var array In this scenarios RenderMode is autodetected as self::MODE_EDIT */
 	public $editScenarios = [ ];
 
-	/** @var null Current render mode */
-	private $_renderMode = null;
+	/** @var \CComponent */
+	public $owner;
+
+	/**
+	 * @var array attributes rendering config
+	 */
+	public $attributes = [];
 
 
-	public function renderField($renderMode, $fieldType, $attributeName, $fieldParams, $htmlOptions = [], $value = false) {
+	/**
+	 * return behaviour owner
+	 * @return \CActiveRecord|\CComponent
+	 */
+	public function getOwner()
+	{
+		if ($this->owner === null) {
+			return parent::getOwner();
+		} else {
+			return $this->owner;
+		}
+	}
+
+	/**
+	 * Render input field
+	 *
+	 * @param $renderMode
+	 * @param $fieldType
+	 * @param $attributeName
+	 * @param $fieldParams
+	 * @param array $htmlOptions
+	 * @param bool|false $value
+	 * @return string
+	 * @throws \CException
+	 */
+	protected function renderField($renderMode, $fieldType, $attributeName, $fieldParams, $htmlOptions = [], $value = false) {
 
 		$viewFile = $this->_viewName($fieldType, $renderMode);
 		$viewPath = false;
@@ -108,7 +126,7 @@ class RenderableBehavior extends \CActiveRecordBehavior
 
 		// Then search in application views
 		if (!$viewPath) {
-			$path = \YiiBase::getPathOfAlias("application.views.renderable");
+			$path = \YiiBase::getPathOfAlias("application.views.Renderable");
 			if (is_file($path . DIRECTORY_SEPARATOR . $viewFile)) {
 				$viewPath = $path . DIRECTORY_SEPARATOR . $viewFile;
 			}
@@ -116,7 +134,7 @@ class RenderableBehavior extends \CActiveRecordBehavior
 
 		// Lastly search in extension views directory for default view
 		if (!$viewPath) {
-			$path = \YiiBase::getPathOfAlias("application.extensions.renderable.views");
+			$path = \YiiBase::getPathOfAlias("application.extensions.Renderable.views");
 			if (is_file($path . DIRECTORY_SEPARATOR . $viewFile)) {
 				$viewPath = $path . DIRECTORY_SEPARATOR . $viewFile;
 			}
@@ -125,7 +143,7 @@ class RenderableBehavior extends \CActiveRecordBehavior
 		// Okay ;( Lets use default view for all types of fields
 		if (!$viewPath) {
 			$viewFile = $this->_viewName(self::DEFAULT_TYPE, $renderMode);
-			$path = \YiiBase::getPathOfAlias("application.extensions.renderable.views");
+			$path = \YiiBase::getPathOfAlias("application.extensions.Renderable.views");
 			if (is_file($path . DIRECTORY_SEPARATOR . $viewFile)) {
 				$viewPath = $path . DIRECTORY_SEPARATOR . $viewFile;
 			}
@@ -135,17 +153,17 @@ class RenderableBehavior extends \CActiveRecordBehavior
 			return $this->_getController()->renderFile(
 				$viewPath,
 				[
-					'model' => $this->owner,
+					'model' => $this->getOwner(),
 					'attribute' => $attributeName,
 					'fieldParams' => $fieldParams,
-					'htmlOptions' => !empty($htmlOptions)
+					self::P_OPTIONS => !empty($htmlOptions)
 						? $htmlOptions
-						: (isset($fieldParams['htmlOptions'])
-							? $fieldParams['htmlOptions']
+						: (isset($fieldParams[self::P_OPTIONS])
+							? $fieldParams[self::P_OPTIONS]
 							: []),
-					'value' => $value
+					self::P_VALUE => $value
 						? $value
-						: $this->owner->$attributeName,
+						: $this->getOwner()->$attributeName,
 				],
 				true
 			);
@@ -154,45 +172,37 @@ class RenderableBehavior extends \CActiveRecordBehavior
 		}
 	}
 
-	/**
-	 * Get rendered HTML with field value
-	 *
-	 * @param $attribute mixed
-	 * @param $forceMode
-	 * @param array $htmlOptions
-	 * @return string
-	 */
+	/** {@inheritdoc} */
 	public function renderAttribute($attribute, $htmlOptions = [], $forceMode = false)
 	{
 		try {
-			$value = $this->owner->$attribute;
-		} catch (Exception $e) {
+			$value = $this->getOwner()->$attribute;
+		} catch (\Exception $e) {
 			return strtr($this->labelNoAttribute, ['{attribute}'=>$attribute]);
 		}
 
-		$fieldParams = $this->_readParamsFromModel($attribute);
-		$fieldParams = $this->_normalizeAttributeParams($fieldParams);
+		$fieldParams = $this->getAttributeConfig($attribute);
 
-		$inputOptions = \CMap::mergeArray($fieldParams['htmlOptions'], $htmlOptions);
+		$inputOptions = \CMap::mergeArray($fieldParams[self::P_OPTIONS], $htmlOptions);
 
 		$renderMode = ($forceMode !== false)
 			? $forceMode
 			: $this->getRenderMode();
 
-		if ($renderMode == self::MODE_EDIT && !$this->owner->isAttributeSafe($attribute)) {
+		if ($renderMode == self::MODE_EDIT && !$this->getOwner()->isAttributeSafe($attribute)) {
 			$renderMode = self::MODE_VIEW;
 		}
 
-		if (isset($fieldParams['access']) && isset($fieldParams['access'][$this->owner->getScenario()])) {
-			$accessValue = $fieldParams['access'][$this->owner->getScenario()];
-			if ((is_callable($accessValue) && $accessValue($this->owner) == false) || $accessValue == false) {
+		if (isset($fieldParams[self::P_ACCESS]) && isset($fieldParams[self::P_ACCESS][$this->getOwner()->getScenario()])) {
+			$accessValue = $fieldParams[self::P_ACCESS][$this->getOwner()->getScenario()];
+			if ((is_callable($accessValue) && $accessValue($this->getOwner()) == false) || $accessValue == false) {
 				return $this->labelNoAccess;
 			}
 		}
 
 		// Custom render mode can override attribute settings
-		if (!empty($fieldParams['onMode']) && !empty($fieldParams['onMode'][$renderMode])) {
-			$overrideMode = $fieldParams['onMode'][$renderMode];
+		if (!empty($fieldParams[self::P_ON_MODE]) && !empty($fieldParams[self::P_ON_MODE][$renderMode])) {
+			$overrideMode = $fieldParams[self::P_ON_MODE][$renderMode];
 			if (is_array($overrideMode) && !empty($overrideMode)) {
 				$fieldParams = \CMap::mergeArray($fieldParams, $this->_normalizeAttributeParams($overrideMode));
 			} elseif(is_callable($overrideMode)) {
@@ -201,52 +211,21 @@ class RenderableBehavior extends \CActiveRecordBehavior
 		}
 
 		// Field value passing from params without transformation rendered
-		if (!empty($fieldParams['value']) && is_string($fieldParams['value'])) return $fieldParams['value'];
+		if (!empty($fieldParams[self::P_VALUE]) && is_string($fieldParams[self::P_VALUE])) return $fieldParams[self::P_VALUE];
 
-		if ($fieldParams['type'] == self::TYPE_CALLBACK) {
-			return $fieldParams['data'];
+		if ($fieldParams[self::P_TYPE] == self::TYPE_CALLBACK) {
+			return $fieldParams[self::P_DATA];
 		}
 
-		return $this->renderField($renderMode, $fieldParams['type'], $attribute, $fieldParams, $inputOptions);
+		return $this->renderField($renderMode, $fieldParams[self::P_TYPE], $attribute, $fieldParams, $inputOptions);
 	}
 
-	/**
-	 * Select display mode according to model scenario
-	 *
-	 * @return int|null
-	 */
-	public function getRenderMode()
-	{
-		if ($this->_renderMode !== null) {
-			return $this->_renderMode;
-		}
 
-		if (is_array($this->editScenarios) && !empty($this->editScenarios) && in_array($this->owner->getScenario(), $this->editScenarios)) {
-			return self::MODE_EDIT;
-		}
-
-		return self::MODE_VIEW;
-	}
-
-	/**
-	 * Set render mode (view/edit)
-	 * @param $mode
-	 */
-	public function setRenderMode($mode)
-	{
-		$this->_renderMode = $mode;
-	}
-
-	/**
-	 * Format attribute before according to it's type (before view mode render)
-	 * @param $fieldValue
-	 * @param array $fieldParams
-	 * @return string
-	 */
+	/** {@inheritdoc} */
 	public function fieldView($fieldValue, $fieldParams)
 	{
 
-		$fieldType = $fieldParams['type'];
+		$fieldType = $fieldParams[self::P_TYPE];
 
 		if (($methodView = $this->_methodNameByType('view', $fieldType)) !== false) {
 			return $this->$methodView($fieldValue, $fieldParams);
@@ -292,8 +271,8 @@ class RenderableBehavior extends \CActiveRecordBehavior
 		}
 
 		if ($fieldType == self::TYPE_LISTBOX) {
-			return !empty($fieldParams['data'][$fieldValue])
-				? $fieldParams['data'][$fieldValue]
+			return !empty($fieldParams[self::P_DATA][$fieldValue])
+				? $fieldParams[self::P_DATA][$fieldValue]
 				: $this->labelNoValue;
 		}
 
@@ -302,22 +281,16 @@ class RenderableBehavior extends \CActiveRecordBehavior
 			: $this->labelBadValue;
 	}
 
-	/**
-	 * Format attribute before according to it's type (before edit mode render)
-	 *
-	 * @param $attribute Attribute name
-	 * @param array $fieldParams Attribute parameters
-	 * @return string
-	 */
+	/** {@inheritdoc} */
 	public function fieldEdit($attribute, $fieldParams)
 	{
-		$fieldType = $fieldParams['type'];
+		$fieldType = $fieldParams[self::P_TYPE];
 
 		if (($methodEdit = $this->_methodNameByType('edit', $fieldType)) !== false) {
 			return $this->$methodEdit($attribute, $fieldParams);
 		}
 
-		return $this->checkScalar($this->owner->$attribute)
+		return $this->checkScalar($this->getOwner()->$attribute)
 			? $this->editDefault($attribute, $fieldParams)
 			: $this->labelBadValue;
 	}
@@ -333,20 +306,13 @@ class RenderableBehavior extends \CActiveRecordBehavior
 		return (is_scalar($value) || is_null($value));
 	}
 
-	/**
-	 * Get attribute parameters defined in attributeTypes() method
-	 * @param $attribute
-	 * @return array
-	 */
-	private function _readParamsFromModel($attribute) {
-		if (method_exists($this->owner, 'attributeTypes')) {
-			$listTypes = $this->owner->attributeTypes();
-			if (!empty($listTypes[$attribute])) {
-				return $listTypes[$attribute];
-			}
-		}
+	/** {@inheritdoc} */
+	protected function getDefaultAttributeConfig($attribute)
+	{
 
-		return [];
+		return [
+			self::P_TYPE => self::DEFAULT_TYPE
+		];
 	}
 
 	/**
@@ -356,12 +322,12 @@ class RenderableBehavior extends \CActiveRecordBehavior
 	 * @param array|string $params Input params
 	 * @return array Output params
 	 */
-	private function _normalizeAttributeParams($params)
+	protected function normalizeAttributeParams($params)
 	{
 		$attributeParams = [];
 
 		if (is_string($params)) {
-			$attributeParams['type'] = $params;
+			$attributeParams[self::P_TYPE] = $params;
 
 		} elseif (is_array($params)) {
 			$attributeParams = [];
@@ -372,23 +338,23 @@ class RenderableBehavior extends \CActiveRecordBehavior
 					$attributeParams[$k] = $v;
 				} else {
 					if ($k == 0) {
-						$attributeParams['type'] = $v;
+						$attributeParams[self::P_TYPE] = $v;
 					}
 
 					if ($k == 1) {
-						$attributeParams['data'] = $v;
+						$attributeParams[self::P_DATA] = $v;
 					}
 				}
 			}
 		}
 
-		if (empty($attributeParams['type'])) {
-			$attributeParams['type'] = $this->defaultType;
+		if (empty($attributeParams[self::P_TYPE])) {
+			$attributeParams[self::P_TYPE] = $this->defaultType;
 		}
 
 		// Custom scenarios can override attribute settings
-		if (!empty($attributeParams['onScenario']) && !empty($attributeParams['onScenario'][$this->owner->getScenario()])) {
-			$overrideScenario = $attributeParams['onScenario'][$this->owner->getScenario()];
+		if (!empty($attributeParams['onScenario']) && !empty($attributeParams['onScenario'][$this->getOwner()->getScenario()])) {
+			$overrideScenario = $attributeParams['onScenario'][$this->getOwner()->getScenario()];
 			if (is_array($overrideScenario) && !empty($overrideScenario)) {
 				$attributeParams = \CMap::mergeArray($attributeParams, $this->_normalizeAttributeParams($overrideScenario));
 			} elseif(is_callable($overrideScenario)) {
@@ -397,27 +363,27 @@ class RenderableBehavior extends \CActiveRecordBehavior
 		}
 
 		// Callable attributes
-		foreach (['data', 'value'] as $attr) {
+		foreach ([self::P_DATA, self::P_VALUE] as $attr) {
 			if (!empty($attributeParams[$attr]) && !is_array($attributeParams[$attr]) && is_callable($attributeParams[$attr])) {
-				$attributeParams[$attr] = $attributeParams[$attr]($this->owner);
+				$attributeParams[$attr] = $attributeParams[$attr]($this->getOwner());
 			}
 		}
 
 		// Not empty attributes
-		foreach (['data', 'htmlOptions'] as $attr) {
+		foreach ([self::P_DATA, self::P_OPTIONS] as $attr) {
 			if (empty($attributeParams[$attr])) {
 				$attributeParams[$attr] = [];
 			}
 		}
 
 		// Call normalizeXXX method from model
-		$methodName = 'normalize'.ucfirst(strtolower($attributeParams['type']));
-		if (method_exists($this->owner, $methodName)) {
-			$this->owner->$methodName($attributeParams);
+		$methodName = 'normalize'.ucfirst(strtolower($attributeParams[self::P_TYPE]));
+		if (method_exists($this->getOwner(), $methodName)) {
+			$this->getOwner()->$methodName($attributeParams);
 		}
 
 		if (!empty($attributeParams['afterNormalize']) && is_callable($attributeParams['afterNormalize'])) {
-			$attributeParams = $attributeParams['afterNormalize']($attributeParams, $this->owner);
+			$attributeParams = $attributeParams['afterNormalize']($attributeParams, $this->getOwner());
 		}
 
 		return $attributeParams;
@@ -430,7 +396,9 @@ class RenderableBehavior extends \CActiveRecordBehavior
 	 */
 	private function _getController()
 	{
-		return \Yii::app()->getController();
+		return (\Yii::app() instanceof \CWebApplication)
+			? \Yii::app()->getController()
+			: new \Controller('');
 	}
 
 	/**

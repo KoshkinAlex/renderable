@@ -4,8 +4,8 @@
  * @see RenderableBehavior
  * @author: Koshkin Alexey <koshkin.alexey@gmail.com>
  *
- * @var CController $this
- * @var CActiveRecord|RenderableBehavior $model
+ * @var \CController $this
+ * @var \CActiveRecord|RenderableBehavior $model
  * @var mixed $value
  * @var string $attribute
  * @var array $fieldParams
@@ -14,4 +14,11 @@
 
 use Renderable\Behaviors\RenderableBehavior;
 
-return CHtml::activeRadioButtonList($model, $attribute, $fieldParams[RenderableBehavior::P_DATA], $htmlOptions);
+$list = [];
+foreach ($fieldParams[RenderableBehavior::P_DATA] as $k => $v) {
+	if (is_array($value) && in_array($k, $value)) {
+		$list[] = $v;
+	}
+}
+echo implode('<br/>', $list);
+

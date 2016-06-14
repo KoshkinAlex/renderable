@@ -15,6 +15,8 @@
  * @var string $fieldParams['path'] Directory that contains image
  */
 
+use Renderable\Behaviors\RenderableBehavior;
+
 if ($value) {
 	if (!empty($fieldParams['path'])) {
 		$value = $fieldParams['path'].$value;

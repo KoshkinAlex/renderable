@@ -12,6 +12,8 @@
  * @var array $htmlOptions
  */
 
-$data = $fieldParams['data'];
+use Renderable\Behaviors\RenderableBehavior;
 
-echo isset($fieldParams['data'][$value]) ? CHtml::encode($fieldParams['data'][$value]) : $model->labelNoValue;
+$data = $fieldParams[RenderableBehavior::P_DATA];
+
+echo isset($fieldParams[RenderableBehavior::P_DATA][$value]) ? CHtml::encode($fieldParams[RenderableBehavior::P_DATA][$value]) : $model->labelNoValue;

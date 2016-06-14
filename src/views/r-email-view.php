@@ -14,4 +14,4 @@
 
 use Renderable\Behaviors\RenderableBehavior;
 
-return CHtml::activeRadioButtonList($model, $attribute, $fieldParams[RenderableBehavior::P_DATA], $htmlOptions);
+echo \CHtml::link($value, 'mailto:'.$value);

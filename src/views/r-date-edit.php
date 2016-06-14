@@ -12,4 +12,4 @@
  * @var array $htmlOptions
  */
 
-echo CHtml::activeDateField($model, $attribute, $htmlOptions);
+echo \CHtml::activeDateField($model, $attribute, $htmlOptions);

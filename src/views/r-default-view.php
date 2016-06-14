@@ -12,8 +12,10 @@
  * @var array $htmlOptions
  */
 
+use Renderable\Behaviors\RenderableBehavior;
+
 if (!$model->checkScalar($value)) {
 	$value = print_r($value, 1);
 }
 
-echo CHtml::encode($model->$attribute);
+echo \CHtml::encode($model->$attribute);

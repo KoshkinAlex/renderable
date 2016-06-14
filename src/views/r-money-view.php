@@ -12,6 +12,8 @@
  * @var array $htmlOptions
  */
 
+use Renderable\Behaviors\RenderableBehavior;
+
 if (!empty($fieldParams['currencyField'])) {
 	$currency = $model->getAttribute($fieldParams['currencyField']);
 } else {
