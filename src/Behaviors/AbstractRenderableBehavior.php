@@ -7,9 +7,10 @@ namespace Renderable\Behaviors;
 
 /**
  * Class AbstractRenderableBehavior
- * @package Renderable\Behaviors
+ * Base class for all behaviors that define config based \CModel attributes rendering
  *
- * @method \CModel getOwner()
+ * @package Renderable\Behaviors
+ * @method \CFormModel|\CActiveRecord getOwner()
  */
 abstract class AbstractRenderableBehavior extends \CModelBehavior
 {

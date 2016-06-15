@@ -26,12 +26,16 @@ namespace Renderable\Behaviors;
  *
  * @package Renderable\Behaviors
  * @property \CActiveRecord $owner
+ *
+ * @deprecated Use class based attributes types @see RenderableClassBehavior
  */
 class RenderableBehavior extends AbstractRenderableBehavior
 {
 	const P_TYPE = 'type';
 
-	// Types defined in CFormatter
+	/**
+	 * Types defined in @see \CFormatter
+	 */
 	const TYPE_RAW = 'raw';
 	const TYPE_STRING = 'string';
 	const TYPE_TEXT = 'text';
@@ -87,8 +91,8 @@ class RenderableBehavior extends AbstractRenderableBehavior
 
 
 	/**
-	 * return behaviour owner
-	 * @return \CActiveRecord|\CComponent
+	 * Get model to which is attached current behavior
+	 * @return \CFormModel|\CActiveRecord
 	 */
 	public function getOwner()
 	{
@@ -102,13 +106,13 @@ class RenderableBehavior extends AbstractRenderableBehavior
 	/**
 	 * Render input field
 	 *
-	 * @param $renderMode
-	 * @param $fieldType
-	 * @param $attributeName
-	 * @param $fieldParams
+	 * @param string $renderMode
+	 * @param string $fieldType
+	 * @param string $attributeName
+	 * @param array $fieldParams
 	 * @param array $htmlOptions
 	 * @param bool|false $value
-	 * @return string
+	 * @return string Rendered attribute content
 	 * @throws \CException
 	 */
 	protected function renderField($renderMode, $fieldType, $attributeName, $fieldParams, $htmlOptions = [], $value = false) {
@@ -156,12 +160,12 @@ class RenderableBehavior extends AbstractRenderableBehavior
 					'model' => $this->getOwner(),
 					'attribute' => $attributeName,
 					'fieldParams' => $fieldParams,
-					self::P_OPTIONS => !empty($htmlOptions)
+					static::P_OPTIONS => !empty($htmlOptions)
 						? $htmlOptions
-						: (isset($fieldParams[self::P_OPTIONS])
-							? $fieldParams[self::P_OPTIONS]
+						: (isset($fieldParams[static::P_OPTIONS])
+							? $fieldParams[static::P_OPTIONS]
 							: []),
-					self::P_VALUE => $value
+					static::P_VALUE => $value
 						? $value
 						: $this->getOwner()->$attributeName,
 				],
@@ -204,7 +208,7 @@ class RenderableBehavior extends AbstractRenderableBehavior
 		if (!empty($fieldParams[self::P_ON_MODE]) && !empty($fieldParams[self::P_ON_MODE][$renderMode])) {
 			$overrideMode = $fieldParams[self::P_ON_MODE][$renderMode];
 			if (is_array($overrideMode) && !empty($overrideMode)) {
-				$fieldParams = \CMap::mergeArray($fieldParams, $this->_normalizeAttributeParams($overrideMode));
+				$fieldParams = \CMap::mergeArray($fieldParams, $this->normalizeAttributeParams($overrideMode));
 			} elseif(is_callable($overrideMode)) {
 				$fieldParams = $overrideMode($fieldParams);
 			}
@@ -356,7 +360,7 @@ class RenderableBehavior extends AbstractRenderableBehavior
 		if (!empty($attributeParams['onScenario']) && !empty($attributeParams['onScenario'][$this->getOwner()->getScenario()])) {
 			$overrideScenario = $attributeParams['onScenario'][$this->getOwner()->getScenario()];
 			if (is_array($overrideScenario) && !empty($overrideScenario)) {
-				$attributeParams = \CMap::mergeArray($attributeParams, $this->_normalizeAttributeParams($overrideScenario));
+				$attributeParams = \CMap::mergeArray($attributeParams, $this->normalizeAttributeParams($overrideScenario));
 			} elseif(is_callable($overrideScenario)) {
 				$attributeParams = $overrideScenario($attributeParams);
 			}

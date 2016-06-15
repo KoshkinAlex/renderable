@@ -10,6 +10,14 @@ use Renderable\Components\RenderableField;
 use Renderable\FieldType\Listbox;
 use Renderable\FieldType\String;
 
+/**
+ * Class RenderableClassBehavior
+ *
+ * Behavior that attaches to \CModel and allows to define class based attributes config.
+ * Class based attributes definition, instead of template based, allows to extend and inherit other rendering types.
+ *
+ * @package Renderable\Behaviors
+ */
 class RenderableClassBehavior extends AbstractRenderableBehavior
 {
 	const P_CLASS = 'class';
