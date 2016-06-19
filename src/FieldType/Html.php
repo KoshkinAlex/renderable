@@ -11,26 +11,35 @@ namespace Renderable\FieldType;
  */
 class Html extends Text
 {
+	/**
+	 * Trigger called before render
+	 */
+	public function beforeRender() {
+		$this->registerAssets();
+	}
 
 	/** {@inheritdoc} */
 	protected function renderEdit() {
-		\Yii::import('application.extensions.editMe.ExtEditMe');
+		$class = $this->getRenderClass();
 
-		return \Yii::app()->getController()->widget(
-			\ExtEditMe::class,
-			[
-				'model' => $this->getModel(),
-				'attribute' => $this->getAttribute(),
-				'htmlOptions' => ['option' => 'value'],
-				'toolbar' => [
-					['PasteText', 'PasteFromWord', '-', 'Undo', 'Redo'],
-					['Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript', '-', 'RemoveFormat'],
-					['NumberedList', 'BulletedList'],
-					['Link', 'Unlink'],
-					['ShowBlocks', 'Source']
-				],
-			],
-		true);
+		$htmlOptions = $this->getHtmlOptions();
+
+		if (!empty($htmlOptions['id'])) {
+			$id = $htmlOptions['id'];
+		} else {
+			$id = $this->getBehavior()->getController()->getId();
+			$htmlOptions['id'] = $id;
+		}
+		\Yii::app()->getClientScript()->registerScript('render_html_'.$id, "tinymce.init({ selector:'#{$id}' });", \CClientScript::POS_READY);
+
+		return $class::activeTextArea($this->getModel(), $this->getAttribute(), $htmlOptions);
+	}
+
+	/**
+	 * Register custom assets
+	 */
+	protected function registerAssets() {
+		\Yii::app()->getClientScript()->registerScriptFile('//cdn.tinymce.com/4/tinymce.min.js');
 	}
 
 }

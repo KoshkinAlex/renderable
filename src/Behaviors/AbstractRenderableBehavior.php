@@ -155,6 +155,10 @@ abstract class AbstractRenderableBehavior extends \CModelBehavior
 		return true;
 	}
 
+	public function getController() {
+		return \Yii::app()->getController();
+	}
+
 	/**
 	 * Get attribute parameters defined in attributeTypes() method
 	 * @return array
