@@ -14,4 +14,4 @@
 
 use Renderable\Behaviors\RenderableBehavior;
 
-echo $model->renderField(RenderableBehavior::MODE_EDIT, RenderableBehavior::TYPE_STRING, $attribute, $fieldParams, $htmlOptions);
+echo CHtml::activeTextField($model, $attribute, $htmlOptions);

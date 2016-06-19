@@ -33,23 +33,25 @@ class RenderableBehavior extends AbstractRenderableBehavior
 {
 	const P_TYPE = 'type';
 
-	/**
-	 * Types defined in @see \CFormatter
-	 */
-	const TYPE_RAW = 'raw';
+	// Base types
 	const TYPE_STRING = 'string';
-	const TYPE_TEXT = 'text';
-	const TYPE_NTEXT = 'ntext';
-	const TYPE_HTML = 'html';
 	const TYPE_NUMBER = 'number';
+	const TYPE_LISTBOX = 'listbox';
+	const TYPE_TEXT = 'text';
+	const TYPE_HTML = 'html';
 	const TYPE_FLOAT = 'float';
-	const TYPE_GENDER = 'gender';
 	const TYPE_DATE = 'date';
 	const TYPE_TIME = 'time';
 	const TYPE_DATETIME = 'datetime';
-	const TYPE_DATEPICKER = 'datepicker';
 	const TYPE_BOOLEAN = 'boolean';
 	const TYPE_EMAIL = 'email';
+	const TYPE_RADIODUTTONLIST = 'radiobuttonlist';
+
+	// Additional types
+	const TYPE_RAW = 'raw';
+	const TYPE_NTEXT = 'ntext';
+	const TYPE_GENDER = 'gender';
+	const TYPE_DATEPICKER = 'datepicker';
 	const TYPE_IMAGE = 'image';
 	const TYPE_URL = 'url';
 	const TYPE_SIZE = 'size';
@@ -59,8 +61,6 @@ class RenderableBehavior extends AbstractRenderableBehavior
 	// Custom types
 	const TYPE_HIDDEN = 'hidden';
 	const TYPE_CALLBACK = 'callback';
-	const TYPE_LISTBOX = 'listbox';
-	const TYPE_RADIODUTTONLIST = 'radiobuttonlist';
 	const TYPE_MONEY = 'money';
 	const TYPE_CHECKLIST = 'checklist';
 	const TYPE_BITMASK = 'bitmask';
@@ -138,7 +138,7 @@ class RenderableBehavior extends AbstractRenderableBehavior
 
 		// Lastly search in extension views directory for default view
 		if (!$viewPath) {
-			$path = \YiiBase::getPathOfAlias("application.extensions.Renderable.views");
+			$path = dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'views';
 			if (is_file($path . DIRECTORY_SEPARATOR . $viewFile)) {
 				$viewPath = $path . DIRECTORY_SEPARATOR . $viewFile;
 			}
@@ -147,7 +147,7 @@ class RenderableBehavior extends AbstractRenderableBehavior
 		// Okay ;( Lets use default view for all types of fields
 		if (!$viewPath) {
 			$viewFile = $this->_viewName(self::DEFAULT_TYPE, $renderMode);
-			$path = \YiiBase::getPathOfAlias("application.extensions.Renderable.views");
+			$path = dirname(__FILE__) . DIRECTORY_SEPARATOR . '..' . DIRECTORY_SEPARATOR . 'views';
 			if (is_file($path . DIRECTORY_SEPARATOR . $viewFile)) {
 				$viewPath = $path . DIRECTORY_SEPARATOR . $viewFile;
 			}
