@@ -5,17 +5,17 @@
  * @author: Koshkin Alexey <koshkin.alexey@gmail.com>
  *
  * @var CController $this
- * @var CActiveRecord|RenderableBehavior $model
+ * @var CActiveRecord|RenderableArrayBehavior $model
  * @var mixed $value
  * @var string $attribute
  * @var array $fieldParams
  * @var array $htmlOptions
  */
 
-use Renderable\Behaviors\RenderableBehavior;
+use Renderable\Behaviors\RenderableArrayBehavior;
 
-if (!isset($htmlOptions['empty']) && !isset($fieldParams[RenderableBehavior::P_DATA][$model->{$attribute}])) {
-	$fieldParams[RenderableBehavior::P_DATA] = [$model->{$attribute} => $model->labelNoValue] + $fieldParams[RenderableBehavior::P_DATA];
+if (!isset($htmlOptions['empty']) && !isset($fieldParams[RenderableArrayBehavior::P_DATA][$model->{$attribute}])) {
+	$fieldParams[RenderableArrayBehavior::P_DATA] = [$model->{$attribute} => $model->labelNoValue] + $fieldParams[RenderableArrayBehavior::P_DATA];
 }
 
-echo CHtml::activeDropDownList($model, $attribute,  $fieldParams[RenderableBehavior::P_DATA], $htmlOptions);
+echo CHtml::activeDropDownList($model, $attribute,  $fieldParams[RenderableArrayBehavior::P_DATA], $htmlOptions);

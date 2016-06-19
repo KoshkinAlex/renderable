@@ -5,15 +5,15 @@
  * @author: Koshkin Alexey <koshkin.alexey@gmail.com>
  *
  * @var CController $this
- * @var CActiveRecord|RenderableBehavior $model
+ * @var CActiveRecord|RenderableArrayBehavior $model
  * @var mixed $value
  * @var string $attribute
  * @var array $fieldParams
  * @var array $htmlOptions
  */
 
-use Renderable\Behaviors\RenderableBehavior;
+use Renderable\Behaviors\RenderableArrayBehavior;
 
-$data = $fieldParams[RenderableBehavior::P_DATA];
+$data = $fieldParams[RenderableArrayBehavior::P_DATA];
 
-echo isset($fieldParams[RenderableBehavior::P_DATA][$value]) ? CHtml::encode($fieldParams[RenderableBehavior::P_DATA][$value]) : $model->labelNoValue;
+echo isset($fieldParams[RenderableArrayBehavior::P_DATA][$value]) ? CHtml::encode($fieldParams[RenderableArrayBehavior::P_DATA][$value]) : $model->labelNoValue;

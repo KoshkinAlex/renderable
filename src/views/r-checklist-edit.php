@@ -12,6 +12,6 @@
  * @var array $htmlOptions
  */
 
-use Renderable\Behaviors\RenderableBehavior;
+use Renderable\Behaviors\RenderableArrayBehavior;
 
-echo \CHtml::activeCheckBoxList($model, $attribute, $fieldParams[RenderableBehavior::P_DATA]);
+echo \CHtml::activeCheckBoxList($model, $attribute, $fieldParams[RenderableArrayBehavior::P_DATA]);

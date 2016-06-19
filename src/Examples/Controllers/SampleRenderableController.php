@@ -13,14 +13,13 @@ namespace Renderable\Examples\Controllers;
  */
 class SampleRenderableController extends \CController
 {
-
 	/**
 	 * Controller actions for menu
 	 * @return array
 	 */
 	public function getMenu() {
 		return [
-			'index' => 'Configure field types as classes',
+			'index' => 'Sample form',
 			'arrayConfig' => 'Configure field types as arrays',
 		];
 	}
@@ -31,7 +30,7 @@ class SampleRenderableController extends \CController
 	public function actions()
 	{
 		return [
-			'index' => [ 'class' => ClassConfigAction::class ],
+			'index' => [ 'class' => SampleFormAction::class ],
 			'arrayConfig' => [ 'class' => ArrayConfigAction::class ],
 		];
 	}

@@ -5,16 +5,16 @@
 
 namespace Renderable\Examples\Controllers;
 
-use Renderable\Examples\Models\SampleRenderableClassConfig;
+use Renderable\Examples\Models\SampleRenderableForm;
 
 /**
- * Class ClassConfigAction
+ * Class SampleFormAction
  * @package Renderable\Examples\Controllers
  */
-class ClassConfigAction extends \CAction
+class SampleFormAction extends \CAction
 {
 	public function run() {
-		$model = new SampleRenderableClassConfig();
+		$model = new SampleRenderableForm();
 		$this->getController()->render('sample_class', ['model' => $model]);
 	}
 

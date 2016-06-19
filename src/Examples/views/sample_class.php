@@ -3,9 +3,9 @@
  * @author: Koshkin Alexey <koshkin.alexey@gmail.com>
  *
  * @var \Renderable\Examples\Controllers\SampleRenderableController $this
- * @var \Renderable\Examples\Models\SampleRenderableClassConfig $model
+ * @var \Renderable\Examples\Models\SampleRenderableForm $model
  */
-use \Renderable\Behaviors\RenderableClassBehavior as Renderable;
+use \Renderable\Behaviors\RenderableBehavior as Renderable;
 
 $this->renderPartial('_menu');
 

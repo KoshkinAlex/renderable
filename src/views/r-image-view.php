@@ -5,7 +5,7 @@
  * @author: Koshkin Alexey <koshkin.alexey@gmail.com>
  *
  * @var CController $this
- * @var CActiveRecord|RenderableBehavior $model
+ * @var CActiveRecord|RenderableArrayBehavior $model
  * @var mixed $value
  * @var string $attribute
  * @var array $fieldParams
@@ -15,7 +15,7 @@
  * @var string $fieldParams['path'] Directory that contains image
  */
 
-use Renderable\Behaviors\RenderableBehavior;
+use Renderable\Behaviors\RenderableArrayBehavior;
 
 if ($value) {
 	if (!empty($fieldParams['path'])) {

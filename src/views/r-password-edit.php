@@ -12,6 +12,6 @@
  * @var array $htmlOptions
  */
 
-use Renderable\Behaviors\RenderableBehavior;
+use Renderable\Behaviors\RenderableArrayBehavior;
 
 echo CHtml::activePasswordField($model, $attribute, $htmlOptions);

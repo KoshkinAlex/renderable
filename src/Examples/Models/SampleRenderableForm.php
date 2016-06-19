@@ -5,16 +5,16 @@
 
 namespace Renderable\Examples\Models;
 
-use Renderable\Behaviors\RenderableClassBehavior;
+use Renderable\Behaviors\RenderableBehavior;
 
 /**
- * Class SampleRenderableClassConfig
- * Sample form with all field types, based on RenderableClassBehavior
+ * Class SampleRenderableForm
+ * Sample form with all field types, based on RenderableBehavior
  *
  * @package Renderable\Example
- * @property RenderableClassBehavior $renderableClass
+ * @property RenderableBehavior $renderableClass
  */
-class SampleRenderableClassConfig extends AllFieldForm
+class SampleRenderableForm extends AllFieldForm
 {
 	const B_RENDERABLE = 'renderableClass';
 
@@ -22,7 +22,7 @@ class SampleRenderableClassConfig extends AllFieldForm
 	public function behaviors()
 	{
 		return [
-			'renderable' => ['class' => RenderableClassBehavior::class]
+			'renderable' => ['class' => RenderableBehavior::class]
 		];
 	}
 

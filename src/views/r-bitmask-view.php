@@ -5,17 +5,17 @@
  * @author: Koshkin Alexey <koshkin.alexey@gmail.com>
  *
  * @var CController $this
- * @var CActiveRecord|RenderableBehavior $model
+ * @var CActiveRecord|RenderableArrayBehavior $model
  * @var mixed $value
  * @var string $attribute
  * @var array $fieldParams
  * @var array $htmlOptions
  */
 
-use Renderable\Behaviors\RenderableBehavior;
+use Renderable\Behaviors\RenderableArrayBehavior;
 
 $list = [];
-foreach ($fieldParams[RenderableBehavior::P_DATA] as $bit=>$name) {
+foreach ($fieldParams[RenderableArrayBehavior::P_DATA] as $bit=>$name) {
 
 	if ($value & $bit) {
 		$list[] = '<b>+<b>&nbsp;'.$name;
