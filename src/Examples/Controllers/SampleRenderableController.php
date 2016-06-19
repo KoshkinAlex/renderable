@@ -5,9 +5,6 @@
 
 namespace Renderable\Examples\Controllers;
 
-use Renderable\Examples\Models\SampleRenderableArrayConfig;
-use Renderable\Examples\Models\SampleRenderableClassConfig;
-
 /**
  * Class SampleRenderableController
  * Sample controller to check extension possibilities
@@ -17,28 +14,33 @@ use Renderable\Examples\Models\SampleRenderableClassConfig;
 class SampleRenderableController extends \CController
 {
 
-	public $defaultAction = 'classConfig';
-
 	/**
-	 * Attribute types are configured through types classes
+	 * Controller actions for menu
+	 * @return array
 	 */
-	public function actionClassConfig() {
-		$model = new SampleRenderableClassConfig();
-		$this->render('sample_class', ['model' => $model]);
-
+	public function getMenu() {
+		return [
+			'index' => 'Configure field types as classes',
+			'arrayConfig' => 'Configure field types as arrays',
+		];
 	}
 
 	/**
-	 * Attribute types are configured through types array
+	 * Declares class-based actions.
 	 */
-	public function actionArrayConfig() {
-		$model = new SampleRenderableArrayConfig();
-		$this->render('sample_class', ['model' => $model]);
+	public function actions()
+	{
+		return [
+			'index' => [ 'class' => ClassConfigAction::class ],
+			'arrayConfig' => [ 'class' => ArrayConfigAction::class ],
+		];
 	}
 
+	/**
+	 * {@inheritdoc}
+	 */
 	public function getViewPath()
 	{
-		return dirname(__FILE__).'/../views/';
+		return dirname(__FILE__) . '/../views/';
 	}
-
 }

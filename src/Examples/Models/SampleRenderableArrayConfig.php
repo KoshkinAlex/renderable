@@ -9,7 +9,7 @@ use \Renderable\Behaviors\RenderableBehavior;
 
 /**
  * Class AllFieldForm
- * Пример формы со всеми типами полей на основе RenderableBehavior
+ * Sample form with all field types, based on RenderableBehavior
  */
 class SampleRenderableArrayConfig extends AllFieldForm
 {
@@ -17,12 +17,9 @@ class SampleRenderableArrayConfig extends AllFieldForm
 	/** {@inheritdoc} */
 	public function behaviors()
 	{
-		return \CMap::mergeArray(
-			parent::behaviors(),
-			[
-				static::B_RENDERABLE => ['class' => RenderableBehavior::class],
-			]
-		);
+		return [
+			'renderable' => ['class' => RenderableBehavior::class]
+		];
 	}
 
 	/**
@@ -31,11 +28,10 @@ class SampleRenderableArrayConfig extends AllFieldForm
 	public function attributeTypes()
 	{
 		return [
-			'number' => RenderableBehavior::TYPE_NUMBER,
 			'string' => RenderableBehavior::TYPE_STRING,
-			'listbox' => [RenderableBehavior::TYPE_LISTBOX, self::getListBoxData()],
+			'number' => RenderableBehavior::TYPE_NUMBER,
+			'listbox' => [RenderableBehavior::TYPE_LISTBOX, self::getSampleArray()],
 			'text' => RenderableBehavior::TYPE_TEXT,
-			'ntext' => RenderableBehavior::TYPE_NTEXT,
 			'html' => RenderableBehavior::TYPE_HTML,
 			'float' => RenderableBehavior::TYPE_FLOAT,
 			'date' => RenderableBehavior::TYPE_DATE,
@@ -43,9 +39,7 @@ class SampleRenderableArrayConfig extends AllFieldForm
 			'datetime' => RenderableBehavior::TYPE_DATETIME,
 			'boolean' => RenderableBehavior::TYPE_BOOLEAN,
 			'email' => RenderableBehavior::TYPE_EMAIL,
-			'radiobuttonlist' => [RenderableBehavior::TYPE_RADIODUTTONLIST, self::getListBoxData()],
-			'money' => RenderableBehavior::TYPE_MONEY,
-			'checklist' => [RenderableBehavior::TYPE_CHECKLIST, self::getListBoxData()],
+			'radiobuttonlist' => [RenderableBehavior::TYPE_RADIODUTTONLIST, self::getSampleArray()],
 		];
 	}
 

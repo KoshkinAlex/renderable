@@ -13,46 +13,43 @@ abstract class AllFieldForm extends \CFormModel
 {
 	const B_RENDERABLE = 'renderable';
 
-	/** @var int */
+	/** @var int Integer number */
 	public $number;
 
-	/** @var string */
+	/** @var string Text string*/
 	public $string;
 
-	/** @var array */
+	/** @var array Select one of list (listbox input) */
 	public $listbox;
 
-	/** @var string */
+	/** @var string Simple text */
 	public $text;
 
-	/** @var string */
-	public $ntext;
-
-	/** @var string */
+	/** @var string Html formatted text*/
 	public $html;
 
-	/** @var float */
+	/** @var float Floating point number */
 	public $float = 3.1415;
 
-	/** @var string */
+	/** @var string Date */
 	public $date;
 
-	/** @var string */
+	/** @var string Time */
 	public $time;
 
-	/** @var string */
+	/** @var string Date + time */
 	public $datetime;
 
 	/** @var \Datetime */
 	public $datetimeObject;
 
-	/** @var bool */
+	/** @var bool Binary value */
 	public $boolean = true;
 
-	/** @var string */
+	/** @var string Email */
 	public $email;
 
-	/** @var array */
+	/** @var array Select one of list (radiobutton input) */
 	public $radiobuttonlist;
 
 	/**
@@ -64,8 +61,9 @@ abstract class AllFieldForm extends \CFormModel
 
 		$this->number = 123;
 		$this->string = 'String value';
-		$this->listbox = $this->radiobuttonlist = array_keys(self::getListBoxData())[0];
-		$this->text = $this->ntext = $this->html = self::getText();
+		$this->listbox = $this->radiobuttonlist = array_keys(static::getSampleArray())[0];
+		$this->text = static::getSampleText();
+		$this->html = static::getSampleHtml();
 		$this->float = 3.1415;
 		$this->date = (new \DateTime('now'))->format('Y-m-d');
 		$this->time = (new \DateTime('now'))->format('H:i:s');
@@ -96,19 +94,29 @@ abstract class AllFieldForm extends \CFormModel
 	 * Sample array value
 	 * @return array
 	 */
-	public static function getListBoxData()
+	public static function getSampleArray()
 	{
 		return [
 			'key1' => 'value1',
-			'key2' => 'value2'
+			'key2' => 'value2',
+			'key3' => 'value3',
 		];
 	}
 
 	/**
-	 * Samle text value
+	 * Sample text without
 	 * @return string
 	 */
-	protected function getText()
+	protected function getSampleText()
+	{
+		return "Lorem ipsum dolor sit amet<, consectetur adipiscing elit. Maecenas vitae augue metus. Cras molestie tellus diam, eget scelerisque diam sodales sit amet. Morbi eget orci sit amet lacus consequat porttitor. Vestibulum ullamcorper mi quis efficitur molestie. Nunc purus ex, euismod id elementum ut, tempor pretium mi. Etiam mollis condimentum metus, at egestas sapien commodo quis.\nVivamus ultricies tincidunt eros nec cursus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n";
+	}
+
+	/**
+	 * Sample text with html formatting
+	 * @return string
+	 */
+	protected function getSampleHtml()
 	{
 		return '<p>Lorem <b>ipsum</b> dolor sit <a href="#">amet</a>, consectetur adipiscing elit. Maecenas vitae augue metus. Cras molestie tellus diam, eget scelerisque diam sodales sit amet. Morbi eget orci sit amet lacus consequat porttitor. Vestibulum ullamcorper mi quis efficitur molestie. Nunc purus ex, euismod id elementum ut, tempor pretium mi. Etiam mollis condimentum metus, at egestas sapien commodo quis.</p><p>Vivamus ultricies tincidunt eros nec cursus. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>';
 	}
