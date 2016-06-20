@@ -5,6 +5,8 @@
 
 namespace Renderable\Examples\Controllers;
 
+use Renderable\Decorators\ActiveFormDecorator;
+
 /**
  * Class SampleRenderableController
  * Sample controller to check extension possibilities
@@ -20,6 +22,7 @@ class SampleRenderableController extends \CController
 	public function getMenu() {
 		return [
 			'index' => 'Sample form',
+			'activeForm' => 'Active Form decorator',
 			'arrayConfig' => 'Configure field types as arrays',
 		];
 	}
@@ -31,6 +34,7 @@ class SampleRenderableController extends \CController
 	{
 		return [
 			'index' => [ 'class' => SampleFormAction::class ],
+			'activeForm' => [ 'class' => FormAction::class ],
 			'arrayConfig' => [ 'class' => ArrayConfigAction::class ],
 		];
 	}

@@ -7,8 +7,6 @@ namespace Renderable\Behaviors;
 
 use Renderable\Components\RenderableConfigurationException;
 use Renderable\Components\RenderableField;
-use Renderable\FieldType\Listbox;
-use Renderable\FieldType\String;
 
 /**
  * Class RenderableBehavior
@@ -89,8 +87,8 @@ class RenderableBehavior extends AbstractRenderableBehavior
 		$value = $this->getOwner()->{$attribute};
 
 		return is_array($value)
-			? [self::P_CLASS => Listbox::class]
-			: [self::P_CLASS => String::class];
+			? [self::P_CLASS => \Renderable\FieldType\Listbox::class]
+			: [self::P_CLASS => \Renderable\FieldType\String::class];
 	}
 
 	/** {@inheritdoc} */
