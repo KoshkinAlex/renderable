@@ -1,7 +1,7 @@
 <?php
 /**
  * View file for rendering model attribute
- * @see RenderableBehavior
+ * @see Renderable\Behaviors\RenderableArrayBehavior
  * @author: Koshkin Alexey <koshkin.alexey@gmail.com>
  *
  * @var CController $this
@@ -11,7 +11,5 @@
  * @var array $fieldParams
  * @var array $htmlOptions
  */
-
-use Renderable\Behaviors\RenderableArrayBehavior;
 
 echo CHtml::activeTextArea($model, $attribute, $htmlOptions);

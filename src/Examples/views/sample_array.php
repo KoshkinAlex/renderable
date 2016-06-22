@@ -3,11 +3,11 @@
  * @author: Koshkin Alexey <koshkin.alexey@gmail.com>
  *
  * @var \Renderable\Examples\Controllers\SampleRenderableController $this
- * @var \Renderable\Examples\Models\SampleRenderableForm $model
+ * @var \Renderable\Examples\Models\SampleRenderableForm|\Renderable\Behaviors\RenderableArrayBehavior $model
  */
 use \Renderable\Behaviors\RenderableBehavior as Renderable;
 
-$this->renderPartial('_menu');
+$this->beginContent('layout');
 
 foreach ($model->getTestAttributes() as $attribute): ?>
 	<div class="row">
@@ -17,3 +17,4 @@ foreach ($model->getTestAttributes() as $attribute): ?>
 	</div>
 	<hr>
 <?php endforeach; ?>
+<?php $this->endContent(); ?>

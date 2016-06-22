@@ -5,8 +5,6 @@
 
 namespace Renderable\Examples\Controllers;
 
-use Renderable\Decorators\ActiveFormDecorator;
-
 /**
  * Class SampleRenderableController
  * Sample controller to check extension possibilities
@@ -21,8 +19,9 @@ class SampleRenderableController extends \CController
 	 */
 	public function getMenu() {
 		return [
-			'index' => 'Sample form',
-			'activeForm' => 'Active Form decorator',
+			'index' => 'Sample',
+			'horizontalForm' => 'Decorator: Horizontal TWBS Active Form',
+			'verticalForm' => 'Decorator: Vertical TWBS Active Form',
 			'arrayConfig' => 'Configure field types as arrays',
 		];
 	}
@@ -33,9 +32,10 @@ class SampleRenderableController extends \CController
 	public function actions()
 	{
 		return [
-			'index' => [ 'class' => SampleFormAction::class ],
-			'activeForm' => [ 'class' => FormAction::class ],
-			'arrayConfig' => [ 'class' => ArrayConfigAction::class ],
+			'index' => [ 'class' => \Renderable\Examples\Actions\SampleFormAction::class ],
+			'horizontalForm' => [ 'class' => \Renderable\Examples\Actions\BootstrapFormAction::class, 'layout' => 'horizontal'],
+			'verticalForm' => [ 'class' => \Renderable\Examples\Actions\BootstrapFormAction::class, 'layout' => 'vertical' ],
+			'arrayConfig' => [ 'class' => \Renderable\Examples\Actions\ArrayConfigAction::class ],
 		];
 	}
 

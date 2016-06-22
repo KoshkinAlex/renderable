@@ -3,7 +3,7 @@
  * @author: Koshkin Alexey <koshkin.alexey@gmail.com>
  */
 
-namespace Renderable\Examples\Controllers;
+namespace Renderable\Examples\Actions;
 
 use Renderable\Examples\Models\SampleRenderableForm;
 

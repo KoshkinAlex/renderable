@@ -11,13 +11,8 @@ namespace Renderable\Decorators;
  *
  * @method \CActiveForm getDecoratedObject()
  */
-class ActiveFormDecorator extends AbstractRenderableDecorator
+abstract class ActiveFormDecorator extends AbstractRenderableDecorator
 {
-	const LAYOUT_HORIZONTAL = 'horizontal';
-	const LAYOUT_VERTICAL = 'vertical';
-
-	public $layout = self::LAYOUT_VERTICAL;
-
 
 	function __construct($form, $model)
 	{
@@ -25,16 +20,29 @@ class ActiveFormDecorator extends AbstractRenderableDecorator
 		$this->setModel($model);
 	}
 
-	public function decorateAttribute($attributeName) {
-		$renderedAttribute = $this->getModel()->renderAttribute($attributeName);
+	/**
+	 * Create form row with one model attribute
+	 * @param string $attributeName
+	 * @return string
+	 */
+	abstract public function decorateAttribute($attributeName);
 
-		$template = $this->layout == self::LAYOUT_HORIZONTAL ? 'form-group-horizontal' : 'form-group-vertical';
-		$template = 'form-group-vertical';
-		return $this->render($template, ['modelBehavior ' => $this->getModel(), 'attribute' => $attributeName, 'form' => $this->getDecoratedObject()], true);
+	/**
+	 * Decorate many attributes at once
+	 * @param array $attributeList
+	 * @return string
+	 */
+	public function decorateMany($attributeList) {
+		$return = [];
+		foreach ($attributeList as $attribute) {
+			$return[] = $this->decorateAttribute($attribute);
+		}
+
+		return implode("\n", $return);
 	}
 
+	/** {@inheritdoc} */
 	public function getViewPath() {
 		return parent::getViewPath() . DIRECTORY_SEPARATOR . 'ActiveForm';
 	}
-
 }

@@ -7,6 +7,8 @@ namespace Renderable\Behaviors;
 
 use Renderable\Components\RenderableConfigurationException;
 use Renderable\Components\RenderableField;
+use Renderable\FieldType\Listbox;
+use Renderable\FieldType\String;
 
 /**
  * Class RenderableBehavior
@@ -31,7 +33,20 @@ class RenderableBehavior extends AbstractRenderableBehavior
 	 */
 	public function renderAttribute($attribute, $htmlOptions = [], $forceMode = false)
 	{
+		$attributeModel = $this->getRenderableModel($attribute);
+		$attributeModel->setBehavior($this);
 
+		$attributeModel->setRenderMode($forceMode !== false ? $forceMode : $this->getRenderMode());
+		$attributeModel->setHtmlOptions($htmlOptions);
+		return $attributeModel->render();
+	}
+
+	/**
+	 * @param string $attribute
+	 * @return RenderableField
+	 * @throws RenderableConfigurationException
+	 */
+	public function getRenderableModel($attribute) {
 		$fieldParams = $this->getAttributeConfig($attribute);
 
 		if (class_exists($fieldParams[self::P_CLASS])) {
@@ -44,14 +59,11 @@ class RenderableBehavior extends AbstractRenderableBehavior
 			throw new RenderableConfigurationException(sprintf('%s -> %s Only instance of %s can be rendered', __CLASS__, __METHOD__, RenderableField::class));
 		}
 
-		$attributeModel->setBehavior($this);
-
 		$attributeModel->setModel($this->getOwner());
 		$attributeModel->setFieldParams($fieldParams);
 		$attributeModel->setAttribute($attribute);
-		$attributeModel->setRenderMode($forceMode);
-		if (!empty($htmlOptions['controlOptions'])) $attributeModel->setHtmlOptions($htmlOptions['controlOptions']);
-		return $attributeModel->render();
+
+		return $attributeModel;
 	}
 
 	/**
@@ -87,8 +99,8 @@ class RenderableBehavior extends AbstractRenderableBehavior
 		$value = $this->getOwner()->{$attribute};
 
 		return is_array($value)
-			? [self::P_CLASS => \Renderable\FieldType\Listbox::class]
-			: [self::P_CLASS => \Renderable\FieldType\String::class];
+			? [self::P_CLASS => Listbox::class]
+			: [self::P_CLASS => String::class];
 	}
 
 	/** {@inheritdoc} */

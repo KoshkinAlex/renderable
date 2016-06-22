@@ -12,7 +12,7 @@
  * @var array $htmlOptions
  */
 
-use Renderable\Behaviors\RenderableArrayBehavior;
+use Renderable\Behaviors\RenderableBehavior;
 
 \Yii::app()->clientScript->registerScript('r-bitmask-edit', "
 	$(document).on('change', '.js-bitmask-control input[type=checkbox]', function() {
@@ -31,7 +31,7 @@ use Renderable\Behaviors\RenderableArrayBehavior;
 ");
 
 $list = [];
-foreach (array_keys($fieldParams[RenderableArrayBehavior::P_DATA]) as $bit) {
+foreach (array_keys($fieldParams[RenderableBehavior::P_DATA]) as $bit) {
 	if ($value & $bit) {
 		$list[] = $bit;
 	}
@@ -39,5 +39,5 @@ foreach (array_keys($fieldParams[RenderableArrayBehavior::P_DATA]) as $bit) {
 
 echo \CHtml::openTag('div', ['class'=>'js-bitmask-control']);
 echo \CHtml::activeHiddenField($model, $attribute, ['class'=>'js-bitmask-value']);
-echo \CHtml::checkBoxList('bitmask-'.$attribute, $list, $fieldParams[RenderableArrayBehavior::P_DATA]);
+echo \CHtml::checkBoxList('bitmask-'.$attribute, $list, $fieldParams[RenderableBehavior::P_DATA]);
 echo \CHtml::closeTag('div');
