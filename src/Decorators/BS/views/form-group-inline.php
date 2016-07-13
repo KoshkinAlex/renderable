@@ -11,5 +11,5 @@
 ?>
 <div class="form-group">
 	<?= $form->label($modelBehavior->getOwner(), $attribute); ?>
-	<?= $modelBehavior->renderAttribute($attribute, ['class' => 'form-control']); ?>
+	<?php $this->render('_renderField', $_data_); ?>
 </div>

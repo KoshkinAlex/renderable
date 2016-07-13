@@ -3,7 +3,9 @@
  * @author: Koshkin Alexey <koshkin.alexey@gmail.com>
  */
 
-namespace Renderable\Decorators;
+namespace Renderable\Decorators\BS;
+
+use Renderable\Decorators\ActiveFormDecorator;
 
 /**
  * Class BSHorizontalActiveFormDecorator

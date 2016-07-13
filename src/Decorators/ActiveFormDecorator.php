@@ -40,9 +40,4 @@ abstract class ActiveFormDecorator extends AbstractRenderableDecorator
 
 		return implode("\n", $return);
 	}
-
-	/** {@inheritdoc} */
-	public function getViewPath() {
-		return parent::getViewPath() . DIRECTORY_SEPARATOR . 'ActiveForm';
-	}
 }

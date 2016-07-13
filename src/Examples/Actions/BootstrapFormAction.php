@@ -5,7 +5,6 @@
 
 namespace Renderable\Examples\Actions;
 
-
 use Renderable\Behaviors\RenderableBehavior;
 use Renderable\Examples\Models\SampleRenderableForm;
 
