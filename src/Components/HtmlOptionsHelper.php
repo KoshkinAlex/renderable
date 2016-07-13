@@ -5,7 +5,10 @@
 
 namespace Renderable\Components;
 
-
+/**
+ * Class HtmlOptionsHelper
+ * @package Renderable\Components
+ */
 class HtmlOptionsHelper
 {
 

@@ -22,7 +22,7 @@ class SampleRenderableForm extends AllFieldForm
 	public function behaviors()
 	{
 		return [
-			static::B_RENDERABLE => [RenderableBehavior::P_CLASS => RenderableBehavior::class]
+			static::B_RENDERABLE => ['class' => RenderableBehavior::class]
 		];
 	}
 

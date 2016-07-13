@@ -9,6 +9,7 @@ use Renderable\Behaviors\RenderableArrayBehavior;
 
 /**
  * Class RenderableField
+ * @package Renderable\Components
  */
 abstract class RenderableField {
 
