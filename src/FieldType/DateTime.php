@@ -14,6 +14,9 @@ use Renderable\Components\RenderableField;
  */
 class DateTime extends RenderableField
 {
+	/** Constants for names of configurable parameters */
+	const P_FORMAT = 'format';
+
 	/** @var string Format in view mode */
 	public $format = 'Y-m-d';
 

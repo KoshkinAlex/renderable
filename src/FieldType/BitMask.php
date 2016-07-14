@@ -13,17 +13,27 @@ use Renderable\Components\RenderableField;
  */
 class BitMask extends RenderableField
 {
-	const F_DATA = 'data';
+	/** Constants for names of configurable parameters */
+	const P_DATA = 'data';
+	const P_VIEW_DELIMITER = 'viewDelimiter';
+	const P_ONLY_ACTIVE = 'showOnlyActive';
+	const P_TEMPLATE_VIEW_ENABLED = 'templateViewEnabled';
+	const P_TEMPLATE_VIEW_DISABLED = 'templateViewDisabled';
 
+	/** @var array Data array with bit values as keys and bit labels as values */
 	public $data = [];
 
+	/** @var string Delimiter for separating bit values in view mode */
 	public $viewDelimiter = "<br>\n";
 
+	/** @var boolean In view mode show only enabled bit values */
 	public $showOnlyActive = true;
 
-	public $templateShowEnabled = "<b>+<b>&nbsp;{label}";
+	/** @var string Template for enabled bit label in view mode */
+	public $templateViewEnabled = "<b>+<b>&nbsp;{label}";
 
-	public $templateShowDisabled = "<b>-<b>&nbsp;{label}";
+	/** @var string Template for disabled bit label in view mode */
+	public $templateViewDisabled = "<b>-<b>&nbsp;{label}";
 
 	/** {@inheritdoc} */
 	protected function renderView()
@@ -31,12 +41,12 @@ class BitMask extends RenderableField
 		$list = [];
 		foreach ($this->getData() as $bit => $name) {
 			if ($this->hasBit($bit)) {
-				$list[] = strtr($this->templateShowEnabled, [
+				$list[] = strtr($this->templateViewEnabled, [
 					'{label}' =>$name
 				]);
 			} else {
 				if ($this->showOnlyActive) continue;
-				$list[] = strtr($this->templateShowDisabled, [
+				$list[] = strtr($this->templateViewDisabled, [
 					'{label}' =>$name
 				]);
 			}
@@ -82,7 +92,7 @@ class BitMask extends RenderableField
 	}
 
 	/**
-	 * Registar javascript
+	 * Register javascript
 	 */
 	protected function addEditJS() {
 		\Yii::app()->clientScript->registerCoreScript('jquery');

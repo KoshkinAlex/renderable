@@ -55,6 +55,8 @@ abstract class AllFieldForm extends \CFormModel
 	/** @var integer Each bit can be set as independent checkbox */
 	public $bitmask;
 
+	public $checkbox;
+
 	/**
 	 * Init form fields with sample values
 	 */
@@ -75,6 +77,7 @@ abstract class AllFieldForm extends \CFormModel
 		$this->boolean = true;
 		$this->email = 'test@email.com';
 		$this->bitmask = 0b0010 & 0b0100;
+		$this->checkbox = true;
 	}
 
 	/**

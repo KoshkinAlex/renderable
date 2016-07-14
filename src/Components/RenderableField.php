@@ -13,6 +13,9 @@ use Renderable\Behaviors\RenderableArrayBehavior;
  */
 abstract class RenderableField {
 
+	/** Constants for names of configurable parameters */
+	const P_ALLOW_EMPTY = 'allowEmpty';
+
 	/** @var bool Can be selected empty value */
 	public $allowEmpty = true;
 

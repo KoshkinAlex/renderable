@@ -45,6 +45,7 @@ class SampleRenderableForm extends AllFieldForm
 			'email' 			=> \Renderable\FieldType\Email::class,
 			'radiobuttonlist' 	=> [\Renderable\FieldType\Radiobutton::class, self::getSampleArray()],
 			'bitmask' 			=> [\Renderable\FieldType\BitMask::class, self::getBitMask()],
+			'checkbox' 			=> \Renderable\FieldType\Checkbox::class,
 		];
 	}
 

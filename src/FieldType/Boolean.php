@@ -13,6 +13,10 @@ use Renderable\Components\RenderableScalarInput;
  */
 class Boolean extends RenderableScalarInput
 {
+	/** Constants for names of configurable parameters */
+	const P_YES = 'yes';
+	const P_NO = 'yes';
+
 	public $allowEmpty = false;
 
 	/** @var string Label for true value */

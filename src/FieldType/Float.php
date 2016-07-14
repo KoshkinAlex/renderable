@@ -11,6 +11,9 @@ namespace Renderable\FieldType;
  */
 class Float extends Number
 {
+	/** Constants for names of configurable parameters */
+	const P_PRECISION = 'precision';
+
 	public $precision = 2;
 
 	/** {@inheritdoc} */

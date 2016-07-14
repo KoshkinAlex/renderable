@@ -13,16 +13,17 @@ namespace Renderable\Components;
  */
 abstract class RenderableRelatedInput extends RenderableArrayInput
 {
+	/** Constants for names of configurable parameters */
 	const P_RELATION = 'relation';
 	const P_MODEL = 'relatedModel';
 
 	/** @var bool Can be selected empty value */
 	public $relation = null;
 
-	/** @var \ActiveRecord|null|false  */
+	/** @var \CActiveRecord|null|false  */
 	public $relatedModel  =null;
 
-	/** @var \ActiveRecord[]|false  */
+	/** @var \CActiveRecord[]|false  */
 	private $_relatedData = false;
 
 	/**

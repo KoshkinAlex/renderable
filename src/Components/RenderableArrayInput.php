@@ -13,8 +13,8 @@ namespace Renderable\Components;
  */
 abstract class RenderableArrayInput extends RenderableField
 {
-	const F_DATA = 'data';
-	const F_ALLOW_EMPTY = 'allowEmpty';
+	/** Constants for names of configurable parameters */
+	const P_DATA = 'data';
 
 	/** @var bool Can be selected empty value */
 	public $allowEmpty = true;
