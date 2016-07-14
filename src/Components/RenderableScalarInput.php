@@ -9,7 +9,7 @@ namespace Renderable\Components;
  * Class RenderableScalarInput
  * Base class for all input types that contain scalar value as data
  *
- * @package components\FieldType
+ * @package Renderable\Components
  */
 abstract class RenderableScalarInput extends RenderableField
 {

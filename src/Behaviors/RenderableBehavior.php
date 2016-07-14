@@ -49,10 +49,10 @@ class RenderableBehavior extends AbstractRenderableBehavior
 	public function getRenderableModel($attribute) {
 		$fieldParams = $this->getAttributeConfig($attribute);
 
-		if (class_exists($fieldParams[self::P_CLASS])) {
-			$attributeModel = new $fieldParams[self::P_CLASS];
+		if (class_exists($fieldParams[static::P_CLASS])) {
+			$attributeModel = new $fieldParams[static::P_CLASS];
 		} else {
-			throw new RenderableConfigurationException(sprintf('Configuration option %s nor found', self::P_CLASS));
+			throw new RenderableConfigurationException(sprintf('Configuration option %s or target class not found', static::P_CLASS));
 		}
 
 		if (!$attributeModel instanceof RenderableField) {
@@ -99,8 +99,8 @@ class RenderableBehavior extends AbstractRenderableBehavior
 		$value = $this->getOwner()->{$attribute};
 
 		return is_array($value)
-			? [self::P_CLASS => Listbox::class]
-			: [self::P_CLASS => String::class];
+			? [static::P_CLASS => Listbox::class]
+			: [static::P_CLASS => String::class];
 	}
 
 	/** {@inheritdoc} */
@@ -109,7 +109,7 @@ class RenderableBehavior extends AbstractRenderableBehavior
 		$attributeParams = [];
 
 		if (is_string($params)) {
-			$attributeParams[self::P_CLASS] = $params;
+			$attributeParams[static::P_CLASS] = $params;
 
 		} elseif (is_array($params)) {
 			$attributeParams = [];
@@ -120,11 +120,11 @@ class RenderableBehavior extends AbstractRenderableBehavior
 					$attributeParams[$k] = $v;
 				} else {
 					if ($k == 0) {
-						$attributeParams[self::P_CLASS] = $v;
+						$attributeParams[static::P_CLASS] = $v;
 					}
 
 					if ($k == 1) {
-						$attributeParams[self::P_DATA] = $v;
+						$attributeParams[static::P_DATA] = $v;
 					}
 				}
 			}
