@@ -52,6 +52,9 @@ abstract class AllFieldForm extends \CFormModel
 	/** @var array Select one of list (radiobutton input) */
 	public $radiobuttonlist;
 
+	/** @var integer Each bit can be set as independent checkbox */
+	public $bitmask;
+
 	/**
 	 * Init form fields with sample values
 	 */
@@ -71,6 +74,7 @@ abstract class AllFieldForm extends \CFormModel
 		$this->datetimeObject = new \DateTime('now');
 		$this->boolean = true;
 		$this->email = 'test@email.com';
+		$this->bitmask = 0b0010 & 0b0100;
 	}
 
 	/**
@@ -100,6 +104,20 @@ abstract class AllFieldForm extends \CFormModel
 			'key1' => 'value1',
 			'key2' => 'value2',
 			'key3' => 'value3',
+		];
+	}
+
+	/**
+	 * Sample value for bit mask field
+	 * @return array
+	 */
+	public static function getBitMask()
+	{
+		return [
+			0b0001 => 'value1',
+			0b0010 => 'value2',
+			0b0100 => 'value3',
+			0b1000 => 'value4',
 		];
 	}
 
