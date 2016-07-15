@@ -46,6 +46,11 @@ class SampleRenderableForm extends AllFieldForm
 			'radiobuttonlist' 	=> [\Renderable\FieldType\Radiobutton::class, self::getSampleArray()],
 			'bitmask' 			=> [\Renderable\FieldType\BitMask::class, self::getBitMask()],
 			'checkbox' 			=> \Renderable\FieldType\Checkbox::class,
+			'dateInterval'		=> [
+				\Renderable\FieldType\DateInterval::class,
+				\Renderable\FieldType\DateInterval::P_FIELD_FROM => 'dateIntervalFrom',
+				\Renderable\FieldType\DateInterval::P_FIELD_TO => 'dateIntervalTo',
+			],
 		];
 	}
 

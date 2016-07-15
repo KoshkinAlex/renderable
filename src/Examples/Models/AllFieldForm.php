@@ -57,6 +57,10 @@ abstract class AllFieldForm extends \CFormModel
 
 	public $checkbox;
 
+	public $dateInterval;
+	public $dateIntervalFrom;
+	public $dateIntervalTo;
+
 	/**
 	 * Init form fields with sample values
 	 */
@@ -78,6 +82,15 @@ abstract class AllFieldForm extends \CFormModel
 		$this->email = 'test@email.com';
 		$this->bitmask = 0b0010 & 0b0100;
 		$this->checkbox = true;
+		$this->dateIntervalFrom = (new \DateTime('yesterday'))->format('Y-m-d');
+		$this->dateIntervalTo = (new \DateTime('now'))->format('Y-m-d');
+		$this->dateInterval = [$this->dateIntervalFrom, $this->dateIntervalTo];
+	}
+
+	public function rules() {
+		return [
+			[array_keys(static::attributeTypes()), \CSafeValidator::class],
+		];
 	}
 
 	/**

@@ -20,6 +20,7 @@ abstract class AbstractRenderableBehavior extends \CModelBehavior
 	const P_OPTIONS = 'htmlOptions';
 	const P_ACCESS = 'access';
 	const P_ON_MODE = 'onMode';
+	const P_EDIT_SCENARIOS = 'editScenarios';
 
 	// Render modes
 	const MODE_VIEW = 'view';
@@ -41,6 +42,9 @@ abstract class AbstractRenderableBehavior extends \CModelBehavior
 
 	/** @var string Label that replaces value that can't be rendered with current attribute type */
 	public $labelBadValue = '[value not renderable]';
+
+	/** @var array In this scenarios render mode auto detection returns MODE_EDIT (in others MODE_VIEW) */
+	public $editScenarios = [];
 
 	/** @var array Key value array for attribute settings */
 	protected $settings = [];
