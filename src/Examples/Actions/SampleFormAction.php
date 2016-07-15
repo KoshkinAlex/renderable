@@ -13,8 +13,10 @@ use Renderable\Examples\Models\SampleRenderableForm;
  */
 class SampleFormAction extends \CAction
 {
+	public $formClass = SampleRenderableForm::class;
+
 	public function run() {
-		$model = new SampleRenderableForm();
+		$model = new $this->formClass;
 		$this->getController()->render('sample_class', ['model' => $model]);
 	}
 

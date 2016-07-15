@@ -26,7 +26,7 @@ abstract class RenderableArrayInput extends RenderableField
 	 * List value for selected attribute value
 	 * @return mixed|null
 	 */
-	protected function getDataValue()
+	protected function getViewValue()
 	{
 		return isset($this->data) && isset($this->data[$this->getValue()])
 			? $this->data[$this->getValue()]

@@ -24,8 +24,8 @@ class Listbox extends RenderableArrayInput
 	/** {@inheritdoc} */
 	protected function renderView()
 	{
-		return $this->getDataValue()
-			? (string)$this->getDataValue()
+		return $this->getViewValue()
+			? (string)$this->getViewValue()
 			: $this->getNoValue();
 	}
 
