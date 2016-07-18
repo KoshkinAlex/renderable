@@ -106,7 +106,7 @@ class RenderableBehavior extends AbstractRenderableBehavior
 	/** {@inheritdoc} */
 	protected function normalizeAttributeParams($params)
 	{
-		$attributeParams = [];
+		$attributeParams = parent::normalizeAttributeParams($params);
 
 		if (is_string($params)) {
 			$attributeParams[static::P_CLASS] = $params;
@@ -130,7 +130,12 @@ class RenderableBehavior extends AbstractRenderableBehavior
 			}
 		}
 
+		foreach ($attributeParams as $k=>$v) {
+			if (is_callable($v)) {
+				$attributeParams[$k] = $v();
+			}
+		}
+
 		return $attributeParams;
 	}
-
 }

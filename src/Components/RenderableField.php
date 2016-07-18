@@ -5,7 +5,7 @@
 
 namespace Renderable\Components;
 
-use Renderable\Behaviors\RenderableArrayBehavior;
+use Renderable\Behaviors\RenderableBehavior;
 
 /**
  * Class RenderableField
@@ -150,12 +150,11 @@ abstract class RenderableField {
 	/** {@inheritdoc} */
 	public function render()
 	{
-
 		if (method_exists($this, 'beforeRender')) {
 			$this->beforeRender();
 		}
 
-		if ($this->getRenderMode() == RenderableArrayBehavior::MODE_EDIT) {
+		if ($this->getRenderMode() == RenderableBehavior::MODE_EDIT) {
 			return $this->renderEdit();
 		} else {
 			return $this->renderView();
