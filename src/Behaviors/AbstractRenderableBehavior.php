@@ -5,6 +5,8 @@
 
 namespace Renderable\Behaviors;
 
+use Renderable\Components\RenderableConfigurationException;
+
 /**
  * Class AbstractRenderableBehavior
  * Base class for all behaviors that define config based \CModel attributes rendering
@@ -52,6 +54,8 @@ abstract class AbstractRenderableBehavior extends \CModelBehavior
 	/** @var null Current render mode */
 	private $_renderMode = null;
 
+	private $_modelConfig = null;
+
 	/**
 	 * Get rendered HTML with field value
 	 *
@@ -85,14 +89,6 @@ abstract class AbstractRenderableBehavior extends \CModelBehavior
 	 * @return array
 	 */
 	abstract protected function getDefaultAttributeConfig($attribute);
-
-	/**
-	 * @param \CEvent $event
-	 */
-	public function afterConstruct($event)
-	{
-		$this->readParamsFromModel();
-	}
 
 	/**
 	 * Select display mode according to model scenario
@@ -139,11 +135,11 @@ abstract class AbstractRenderableBehavior extends \CModelBehavior
 	 */
 	public function getAttributeConfig($attribute)
 	{
-		if (isset($this->settings[$attribute])) {
-			return $this->normalizeAttributeParams($this->settings[$attribute]);
-		}
+		$fieldConfig = !empty($config = $this->getModelConfig()) && !empty($config[$attribute])
+			? $config[$attribute]
+			: $this->getDefaultAttributeConfig($attribute);
 
-		return $this->getDefaultAttributeConfig($attribute);
+		return $this->normalizeAttributeParams($fieldConfig);
 	}
 
 	/**
@@ -166,6 +162,7 @@ abstract class AbstractRenderableBehavior extends \CModelBehavior
 	/**
 	 * Get attribute parameters defined in attributeTypes() method
 	 * @return array
+	 * @deprecated
 	 */
 	protected function readParamsFromModel()
 	{
@@ -174,6 +171,18 @@ abstract class AbstractRenderableBehavior extends \CModelBehavior
 				$this->settings = $this->getOwner()->attributeTypes();
 			}
 		}
+	}
+
+	protected function getModelConfig() {
+		if ($this->_modelConfig === null) {
+			if (method_exists($this->getOwner(), self::METHOD_ATTR_TYPES)) {
+				$this->_modelConfig = (array)$this->getOwner()->attributeTypes();
+			} else {
+				throw new RenderableConfigurationException("Method [".self::METHOD_ATTR_TYPES."] is not configured for class [".get_class($this->getOwner())."]");
+			}
+		}
+
+		return $this->_modelConfig;
 	}
 
 	/**
