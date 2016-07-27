@@ -138,4 +138,19 @@ class RenderableBehavior extends AbstractRenderableBehavior
 
 		return $attributeParams;
 	}
+
+	/**
+	 * If we need filter some values after form submit (i.e. convert types) we should define RenderableField->afterSubmit() method
+	 * @param \CModelEvent $event
+	 * @throws RenderableConfigurationException
+	 */
+	public function beforeValidate($event) {
+		foreach (array_keys($this->getModelConfig()) as $attributeName) {
+			$model = $this->getRenderableModel($attributeName);
+
+			if (method_exists($model, RenderableField::METHOD_AFTER_SUBMIT)) {
+				$model->afterSubmit();
+			}
+		}
+	}
 }

@@ -10,11 +10,17 @@ use Renderable\Behaviors\RenderableBehavior;
 /**
  * Class RenderableField
  * @package Renderable\Components
+ *
+ * @method void afterSubmit()
+ * @method void beforeRender()
  */
 abstract class RenderableField {
 
 	/** Constants for names of configurable parameters */
 	const P_ALLOW_EMPTY = 'allowEmpty';
+
+	const METHOD_BEFORE_RENDER = 'beforeRender';
+	const METHOD_AFTER_SUBMIT = 'afterSubmit';
 
 	/** @var bool Can be selected empty value */
 	public $allowEmpty = true;
@@ -130,6 +136,15 @@ abstract class RenderableField {
 	}
 
 	/**
+	 * Set new value for owner model attribute
+	 * @param mixed $newValue
+	 * @return void
+	 */
+	public function setValue($newValue) {
+		$this->getModel()->{$this->_attribute} = $newValue;
+	}
+
+	/**
 	 * @param array $fieldParams
 	 */
 	public function setFieldParams($fieldParams)
@@ -150,7 +165,7 @@ abstract class RenderableField {
 	/** {@inheritdoc} */
 	public function render()
 	{
-		if (method_exists($this, 'beforeRender')) {
+		if (method_exists($this, static::METHOD_BEFORE_RENDER)) {
 			$this->beforeRender();
 		}
 
