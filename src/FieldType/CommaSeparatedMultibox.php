@@ -48,7 +48,9 @@ class CommaSeparatedMultibox extends RenderableSerializedArrayInput
 	/** {@inheritdoc} */
 	protected function serializeData($unSerializedData)
 	{
-		return implode($this->separator, $unSerializedData);
+		return !empty($unSerializedData) && is_array($unSerializedData)
+			? implode($this->separator, $unSerializedData)
+			: '';
 	}
 
 	/** {@inheritdoc} */
