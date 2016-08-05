@@ -15,7 +15,7 @@ class Boolean extends RenderableScalarInput
 {
 	/** Constants for names of configurable parameters */
 	const P_YES = 'yes';
-	const P_NO = 'yes';
+	const P_NO = 'no';
 
 	public $allowEmpty = false;
 
