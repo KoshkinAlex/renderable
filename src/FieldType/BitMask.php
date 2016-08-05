@@ -60,7 +60,7 @@ class BitMask extends RenderableField
 	{
 		$this->addEditJS();
 		$list = [];
-		foreach ($this->getData() as $bit) {
+		foreach ($this->getData() as $bit => $name) {
 			if ($this->hasBit($bit)) {
 				$list[] = $bit;
 			}
